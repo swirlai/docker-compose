@@ -4,21 +4,16 @@
 * [DS-999](https://swirl.youtrack.cloud/issue/DS-999)
 
 ## What was implemented?
-
 Describe what was done and the idea behind it.
 
 ## Output screenshots (if applicable)
-
 Post the output screenshots, how an UI is affected or added due to this implementation.
 
 ## Testing
-
 Here describe any testing details outside of the automated github action workflows (they decorate the PR)
 
-## Related Pull Request (is applicable)
-
+## Related Pull Request (if applicable)
 List any related PRs, like a frontend PR, for example.
 
-## More information (is applicable)
-
+## More information (if applicable)
 Provide any additional information the reviewer might need for this PR

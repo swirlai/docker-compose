@@ -1,0 +1,94 @@
+name: Swirl - Integration Tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/integration-test.yml'
+      - 'docker-compose.yml'
+      - 'nginx/nginx-*'
+      - 'scripts/swirl-*'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/integration-test.yml'
+      - 'docker-compose.yml'
+      - 'nginx/nginx-*'
+      - 'scripts/swirl-*'
+
+jobs:
+  # get-docker-images:
+  #   runs-on: ubuntu-latest-m
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.SBS_DOCKER_USER }}
+  #         password: ${{ secrets.SBS_DOCKER_PAT }}
+
+  #     - name: Pull Docker images
+  #       run: sh scripts/pull-docker-images.sh
+
+  #     - name: Upload Docker image as artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: docker-image
+  #         path: docker-images.tar.gz
+
+  compose-test:
+    name: Compose Test (Use TLS=${{ matrix.USE_TLS }}, Local PostgreSQL=${{ matrix.USE_LOCAL_POSTGRES }})
+    runs-on: ubuntu-latest-m
+    # needs: get-docker-images
+    strategy:
+      fail-fast: false
+      matrix:
+        # USE_TLS: ["true", "false"]
+        USE_TLS: ["false"]
+        # USE_LOCAL_POSTGRES: ["true", "false"]
+        USE_LOCAL_POSTGRES: ["true"]
+    env:
+      USE_TLS: ${{ matrix.USE_TLS }}
+      USE_LOCAL_POSTGRES: ${{ matrix.USE_LOCAL_POSTGRES }}
+      TIKA_VERSION: ${{ vars.TIKA_VERSION }}
+      TTM_VERSION: ${{ vars.TTM_VERSION }}
+      SWIRL_VERSION: ${{ vars.SWIRL_VERSION }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # - name: Download Docker image artifact
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: docker-image
+
+      # - name: Load Docker image
+      #   run: |
+      #     gunzip -c docker-images.tar.gz | docker load
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.SBS_DOCKER_USER }}
+          password: ${{ secrets.SBS_DOCKER_PAT }}
+
+      - name: Start Docker Compose
+        run: |
+          echo "${{ secrets.SWIRL_ENV }}" | base64 --decode > .env
+          docker compose --profile all up -d
+
+      - name: Wait for services to become healthy
+        run: sh scripts/check-service-health.sh
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Stop Docker Compose
+        if: always()
+        run: docker compose down -v
