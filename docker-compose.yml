@@ -1,0 +1,160 @@
+services:
+
+  nginx:
+    profiles: ["all", "nginx"]
+    image: nginx:${NGINX_VERSION:-1.27.1}
+    container_name: swirl_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN_NAME: ${FQDN:-teste}
+      USE_TLS: ${USE_TLS:-false}
+    networks: ["swirl"]
+    volumes:
+      - ./nginx/nginx.template:/etc/nginx/nginx.template
+      - ./nginx/nginx-template.notls:/etc/nginx/nginx-template.notls
+      - ./nginx/nginx-template.tls:/etc/nginx/nginx-template.tls
+      - ./nginx/nginx-docker-entrypoint.sh:/docker-entrypoint.sh
+      - ./nginx/certbot/conf/:/etc/letsencrypt
+      - ./nginx/certbot/www/:/var/www/certbot
+    entrypoint: ["/docker-entrypoint.sh"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      swirl:
+        condition: service_healthy
+
+  certbot:
+    profiles: ["all", "certbot"]
+    image: certbot/certbot:${CERTBOT_VERSION:-v2.11.0}
+    container_name: swirl_certbot
+    volumes:
+      - ./nginx/certbot/conf/:/app/nginx/certbot/conf
+      - ./nginx/certbot/www/:/var/www/certbot
+      - ./nginx/certbot/nginx-certbot-docker-entrypoint.sh:/docker-entrypoint.sh
+    entrypoint: ["/docker-entrypoint.sh"]
+    environment:
+      FQDN: ${FQDN}
+      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+    healthcheck:
+      test: ["CMD", "grep", "-q", "healthy", "/app/nginx/certbot/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks: ["swirl"]
+    depends_on:
+      swirl:
+        condition: service_healthy
+
+  postgres:
+    profiles: ["all", "local-postgres"]
+    image: postgres:${POSTGRES_VERSION:-15}
+    container_name: swirl_postgres
+    environment:
+      POSTGRES_USER: ${SQL_USER:-postgres}
+      POSTGRES_PASSWORD: ${SQL_PASSWORD:-postgres}
+      POSTGRES_DB: ${SQL_DATABASE:-swirl}
+    networks: ["swirl"]
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d swirl"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    profiles: ["all", "svc", "redis"]
+    image: redis:${REDIS_VERSION:-7}
+    container_name: swirl_redis
+    networks: ["swirl"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  tika:
+    profiles: ["all", "svc", "tika"]
+    image: swirlai/release-tika-enterprise:${TIKA_VERSION}
+    container_name: swirl_tika
+    networks: ["swirl"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://tika:9998/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  ttm:
+    profiles: ["all", "svc", "ttm"]
+    image: swirlai/release-topic-text-matcher-enterprise:${TTM_VERSION}
+    container_name: swirl_ttm
+    networks: ["swirl"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://ttm:7029"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  swirl-job:
+    profiles: ["all", "setup"]
+    image: swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}
+    container_name: swirl_app_job
+    restart: "no"
+    env_file:
+      - .env
+    command: ["/bin/bash","/tmp/swirl-load-job.sh"]
+    volumes:
+      - ./scripts/swirl-load-job.sh:/tmp/swirl-load-job.sh
+    networks: ["swirl"]
+    depends_on:
+      swirl:
+        condition: service_healthy
+
+  swirl-init:
+    profiles: ["all", "svc", "swirl"]
+    image: swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}
+    container_name: swirl_app_init
+    env_file:
+      - .env
+    networks: ["swirl"]
+    command: ["python", "manage.py", "migrate"]
+
+  swirl:
+    profiles: ["all", "svc", "swirl"]
+    image: swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}
+    container_name: swirl_app
+    mem_limit: 4g
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+      swirl-init:
+        condition: service_completed_successfully
+    command: ["/bin/bash","/tmp/swirl-load.sh"]
+    volumes:
+      - ./scripts/swirl-load.sh:/tmp/swirl-load.sh
+      - ./scripts/swirl-health-check.sh:/tmp/swirl-health-check.sh
+      - ./uploads:/app/uploads
+    networks: ["swirl"]
+    healthcheck:
+      test: ["CMD-SHELL", "/tmp/swirl-health-check.sh || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  db_data:
+
+networks:
+  swirl:
+    driver: bridge
