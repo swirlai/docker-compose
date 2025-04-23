@@ -22,9 +22,9 @@ services:
     entrypoint: ["/docker-entrypoint.sh"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/healthz"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
+      interval: 30s
+      timeout: 10s
+      retries: 5
     depends_on:
       swirl:
         condition: service_healthy
@@ -43,8 +43,8 @@ services:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
     healthcheck:
       test: ["CMD", "grep", "-q", "healthy", "/app/nginx/certbot/health"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 10s
       retries: 5
     networks: ["swirl"]
     depends_on:
@@ -64,8 +64,8 @@ services:
       - db_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d swirl"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 10s
       retries: 5
 
   redis:
@@ -75,8 +75,8 @@ services:
     networks: ["swirl"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 10s
       retries: 5
 
   tika:
@@ -142,13 +142,14 @@ services:
     command: ["/bin/bash","/tmp/swirl-load.sh"]
     volumes:
       - ./scripts/swirl-load.sh:/tmp/swirl-load.sh
+      - ./scripts/swirl-health-check.sh:/tmp/swirl-health-check.sh
       - ./uploads:/app/uploads
     networks: ["swirl"]
     healthcheck:
-      test: ["CMD-SHELL", "curl -f -H 'Content-Type: application/json' -H 'Host: localhost' http://localhost:8000/swirl/health/celery/ || exit 1"]
+      test: ["CMD-SHELL", "/tmp/swirl-health-check.sh || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
       start_period: 60s
 
 volumes:

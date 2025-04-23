@@ -1,67 +1,72 @@
-# Template Gitflow Repository
+![Swirl](https://docs.swirl.today/images/transparent_header_3.png)
 
-This repository serves as a template for Gitflow-based repositories. It includes predefined workflows, actions, and templates to streamline the development process.
+# Swirl Enterprise Edition
+**Notice:** this repository is commercially licensed. A valid license key is required for use.
+Please contact [ hello@swirlaiconnect.com](mailto: hello@swirlaiconnect.com) for more information.
 
-## Repository Structure
+# Installation
+## Minimum System Requirements
+* **OS:** Linux platform (Ubuntu, RHEL) | MacOS X 1
+* **Processor:** +8 VCPU
+* **Memory:** +16 GB RAM
+* **Storage:** 500 GB available space
+* **Docker**: 28 or later
 
-- `.github/`
-    - `workflows/`: Contains GitHub Actions workflows.
-    - `PULL_REQUEST_TEMPLATE.md`: Template for pull requests.
-    - `ISSUE_TEMPLATE/`: Templates for issues.
-- `src/`: Source code directory.
-- `tests/`: Test code directory.
+> **Note:** Swirl does support use of a proxy server between Swirl and target systems. Refer to section TBD for more information.
 
-## Gitflow Workflow
+## Downloading Swirl Enterprise
+### Installing Locally
+For proof-of-value (POV) engagements, Swirl recommends cloning this repository locally. Doing so enables Swirl to provide the fastest possible support during the integration period. To clone Swirl Enterprise Compose, run:
+```
+git clone -b develop https://github.com/swirlai/docker-compose-internal swirl-enterprise-compose
+cd swirl-enterprise-compose
+```
 
-This repository follows the Gitflow branching model:
-- `main`: The production-ready branch.
-- `develop`: The branch for ongoing development.
-- `feature/*`: Branches for new features.
-- `bugfix/*`: Branches for bug fixes.
-- `release_#_#_#`: Older style for branches for preparing a new release.
-- `v#_#_#_#`: New Style for release stabilization branches
+See Configurations instructions below, after you have configured Swirl, you can run it with the following docker command:
+```
+docker compose --profile all --env-file .env up -d
+```
 
-We do not enforce the feature, bugfix naming convention, but it is recommended to follow it.
+## Configuring Swirl Enterprise
+### Licensing
+Add the license provided by Swirl, to the installation's `.env` file. It will be in the following format:
+```
+SWIRL_LICENSE='{"owner": "<owner-name>", "expiration": "<expiration-date>", "key": "<public-key>"}'
+```
+Copy & paste this into the file exactly as it is. Swirl Enterprise will not operate without the correct license configuration.
 
-## GitHub Actions Workflows
+### Database
+The local docker-compose.yml file for Swirl Enterprise is configured to use a local instance of PostgreSQL. If preferred, you can modify the compose file to connect to an external database service. For production environments, Swirl recommends using a dedicated PostgreSQL database.
 
-### Check Spelling
+#### PostgreSQL
+Configure the database environment variables (referenced by a `# CHANGE_ME` comment) in the `.env` file before starting the application:
 
-This workflow checks for spelling errors in the `docs/` directory and runs on changes to the `main` branch or pull requests to `develop` and `main`.
+```
+ADMIN_PASSWORD="" # CHANGE_ME  - Swirl application admin password
+SQL_HOST="postgres" # CHANGE_ME  - Swirl DB host name or domain name
+SQL_PORT="5432" # CHANGE_ME  - Swirl DB port
+SQL_USER="" # CHANGE_ME - Swirl DB User name
+SQL_PASSWORD="" # CHANGE_ME  - Swirl DB User password
+```
 
-```yaml
-name: Check Spelling
+> For more information see: [Admin Guide - Configuring Django](https://docs.swirl.today/Admin-Guide.html#configuring-django).
 
-on:
-  push:
-    branches:
-      - "main"
-    paths:
-      - "docs/**"
-  pull_request:
-    branches:
-      - develop
-      - main
-    paths-ignore:
-      - '.github/**'
-      - 'integrations/**'
-      - 'swirl-infra/**'
-      - 'db.sqlite3.dist'
-  workflow_dispatch:
+# Connecting Swirl to the Enterprise
+## Connecting to Microsoft IDP
+If you will be using Microsoft as your IDP, configure the following environment variables in the `.env` file:
+```
+OAUTH_CONFIG_ISSUER=''              ## Base URL of the OIDC provider (e.g., Microsoft Entra ID). Used to fetch discovery metadata.
+OAUTH_CONFIG_REDIRECT_URI=''        ## URL where the provider will redirect after authentication (must match app registration).
+OAUTH_CONFIG_CLIENT_ID=''           ## The client (application) ID registered with the identity provider.
+OAUTH_CONFIG_TOKEN_ENDPOINT=''      ## OAuth 2.0 token endpoint URL for exchanging authorization code for tokens.
+OAUTH_CONFIG_USER_INFO_ENDPOINT=''  ## Endpoint to fetch authenticated user's profile information (e.g., name, email).
+```
 
-permissions:
-  contents: read
-  actions: read
-  checks: write
-  pull-requests: write
+# Additional Documentation
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Check Spelling
-        uses: crate-ci/typos@master
-        with:
-          config: ./.github/workflows/typos.toml
-          write_changes: true
+[Overview](https://docs.swirlaiconnect.com/) | [Quick Start](https://docs.swirlaiconnect.com/Quick-Start) | [User Guide](https://docs.swirlaiconnect.com/User-Guide) | [Admin Guide](https://docs.swirlaiconnect.com/Admin-Guide) | [M365 Guide]https://docs.swirlaiconnect.com/M365-Guide) | [Developer Guide](https://docs.swirlaiconnect.com/Developer-Guide) | [Developer Reference](https://docs.swirlaiconnect.com/Developer-Reference) | [AI Guide](https://docs.swirlaiconnect.com/AI-Guide)
+
+# Support
+
+For general support, please use the private Slack or Microsoft Teams channel connecting Swirl and your company.
+To report an issue please [create a ticket](https://swirlaiconnect.com/support-ticket).
