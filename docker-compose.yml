@@ -9,17 +9,19 @@ services:
       - "80:80"
       - "443:443"
     environment:
-      DOMAIN_NAME: ${FQDN:-teste}
+      SWIRL_FQDN: ${SWIRL_FQDN}
+      USE_CERT: ${USE_CERT:-false}
       USE_TLS: ${USE_TLS:-false}
     networks: ["swirl"]
     volumes:
       - ./nginx/nginx.template:/etc/nginx/nginx.template
       - ./nginx/nginx-template.notls:/etc/nginx/nginx-template.notls
       - ./nginx/nginx-template.tls:/etc/nginx/nginx-template.tls
-      - ./nginx/nginx-docker-entrypoint.sh:/docker-entrypoint.sh
+      - ./nginx/nginx-docker-entrypoint.sh:/tmp/docker-entrypoint.sh
       - ./nginx/certbot/conf/:/etc/letsencrypt
       - ./nginx/certbot/www/:/var/www/certbot
-    entrypoint: ["/docker-entrypoint.sh"]
+      - ./nginx/certificates/:/etc/nginx/ssl
+    entrypoint: ["/tmp/docker-entrypoint.sh"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/healthz"]
       interval: 30s
@@ -36,11 +38,12 @@ services:
     volumes:
       - ./nginx/certbot/conf/:/app/nginx/certbot/conf
       - ./nginx/certbot/www/:/var/www/certbot
-      - ./nginx/certbot/nginx-certbot-docker-entrypoint.sh:/docker-entrypoint.sh
-    entrypoint: ["/docker-entrypoint.sh"]
+      - ./nginx/certbot/nginx-certbot-docker-entrypoint.sh:/tmp/docker-entrypoint.sh
+    entrypoint: ["/tmp/docker-entrypoint.sh"]
     environment:
-      FQDN: ${FQDN}
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+      SWIRL_FQDN: ${SWIRL_FQDN}
+      USE_CERT: ${USE_CERT:-false}
     healthcheck:
       test: ["CMD", "grep", "-q", "healthy", "/app/nginx/certbot/health"]
       interval: 30s

@@ -3,12 +3,27 @@
 echo "Starting Envsubst"
 
 # Check if TLS is enabled and apply the appropriate nginx config template
-if [ "$USE_TLS" = "true" ]; then
-    echo "Using TLS configuration template"
-    envsubst '${DOMAIN_NAME}' < /etc/nginx/nginx-template.tls > /etc/nginx/nginx.conf
+if [ "$USE_TLS" = "true" ] && [ "$USE_CERT" = "false" ]; then
+  echo "TLS is enabled and USE_CERT is false. Monitoring certificate directory for changes."
+  envsubst '${SWIRL_FQDN}' < /etc/nginx/nginx-template.tls > /etc/nginx/nginx.conf
+  PREVIOUS_STATE=$(find /etc/letsencrypt/live -type f -exec stat --format '%n %Y' {} \;)
+
+  while true; do
+    sleep 5
+    CURRENT_STATE=$(find /etc/letsencrypt/live -type f -exec stat --format '%n %Y' {} \;)
+
+    if [ "$PREVIOUS_STATE" != "$CURRENT_STATE" ]; then
+      echo "Change detected, reloading Nginx..."
+      nginx -s reload
+      PREVIOUS_STATE=$CURRENT_STATE
+    fi
+  done &
+elif [ "$USE_TLS" = "true" ] && [ "$USE_CERT" = "true" ]; then
+  echo "TLS is enabled and USE_CERT is true. Using provided certificates."
+  envsubst '${SWIRL_FQDN}' < /etc/nginx/nginx-template.tls > /etc/nginx/nginx.conf
 else
-    echo "Using non-TLS configuration template"
-    envsubst '${DOMAIN_NAME}' < /etc/nginx/nginx-template.notls > /etc/nginx/nginx.conf
+  echo "TLS is not enabled. Skipping certificate monitoring."
+  envsubst '${SWIRL_FQDN}' < /etc/nginx/nginx-template.notls > /etc/nginx/nginx.conf
 fi
 
 # Check if inotifywait is available (used to watch for certificate changes)

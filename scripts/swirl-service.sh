@@ -47,83 +47,97 @@ docker compose --profile all stop || true
 COMPOSE_PROFILES="svc"  # Base profile for Swirl services
 
 # Conditionally add local Postgres
-if [ "$USE_LOCAL_POSTGRES" = "true" ]; then
+if [ "$USE_LOCAL_POSTGRES" == "true" ]; then
     log "Enabling local Postgres profile."
     COMPOSE_PROFILES="$COMPOSE_PROFILES,local-postgres"
 fi
 
 # Conditionally add Nginx
-if [ "$USE_NGINX" = "true" ]; then
-    log "Enabling Nginx profile."
+if [ "$USE_NGINX" == "true" ]; then
     COMPOSE_PROFILES="$COMPOSE_PROFILES,nginx"
-fi
 
-# Handle TLS and Certbot setup
-if [ "$USE_TLS" = "true" ] && [ ! -f "nginx/certbot/conf/live/$FQDN/privkey.pem" ]; then
-    log "Issuing certificate using Certbot."
-    log "Waiting DNS propagation..."
-    sleep 300
+    # Handle TLS and Certbot setup
+    if [ "$USE_TLS" == "true" ]; then
+        if [ "$USE_CERT" == "false" ]; then
+            log "TLS enabled with Certbot. Starting Nginx and Certbot."
+            log "Issuing certificate using Certbot."
+            log "Waiting DNS propagation..."
+            sleep 300
 
-    # Paths
-    CERTBOT_SOURCE_DIR="/app/nginx/certbot/conf"
-    OPTIONS_FILE="$CERTBOT_SOURCE_DIR/options-ssl-nginx.conf"
-    DHPARAMS_FILE="$CERTBOT_SOURCE_DIR/ssl-dhparams.pem"
+            TEMPLATE_FILE="nginx/nginx.template.tls"
+            SNIPPET="ssl_certificate /etc/letsencrypt/live/\${SWIRL_FQDN}/fullchain.pem;"
 
-    # Directories to copy the configs into
-    TARGET_LOCATIONS="/etc/letsencrypt /app/nginx/certbot/conf /etc/nginx/ssl"
+            if ! grep -Fq "$SNIPPET" "$TEMPLATE_FILE"; then
+                awk '
+                {
+                    if (prev ~ /listen 443 ssl;/ && $0 ~ /server_name .*;/) {
+                        print
+                        print ""
+                        print "    ssl_certificate /etc/letsencrypt/live/${SWIRL_FQDN}/fullchain.pem;"
+                        print "    ssl_certificate_key /etc/letsencrypt/live/${SWIRL_FQDN}/privkey.pem;"
+                        print "    include /etc/letsencrypt/options-ssl-nginx.conf;"
+                        print "    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;"
+                    } else {
+                        print
+                    }
+                    prev = $0
+                }
+                ' "$TEMPLATE_FILE" > tmp && mv tmp "$TEMPLATE_FILE"
+            fi
+            
+            CERTBOT_SOURCE_DIR="/app/nginx/certbot/conf"
+            OPTIONS_FILE="$CERTBOT_SOURCE_DIR/options-ssl-nginx.conf"
+            DHPARAMS_FILE="$CERTBOT_SOURCE_DIR/ssl-dhparams.pem"
+            
+            TARGET_LOCATIONS="/etc/letsencrypt /etc/nginx/ssl"
 
-    # Ensure source directory exists
-    for dir in $TARGET_LOCATIONS; do
-        if [ ! -d "$dir" ]; then
-            mkdir -p "$dir"
-            echo "Created directory: $dir"
-        else
-            echo "Directory already exists: $dir"
+            for DIR in $TARGET_LOCATIONS; do
+                mkdir -p "$DIR"
+                cp "$OPTIONS_FILE" "$DIR/"
+                cp "$DHPARAMS_FILE" "$DIR/"
+                echo "Copied TLS configs to $DIR"
+            done
+
+            certbot certonly --standalone --email $CERTBOT_EMAIL --agree-tos --no-eff-email -d "${SWIRL_FQDN}" --config-dir /app/nginx/certbot/conf
+
+            cp nginx/nginx.template.tls nginx/nginx.template
+            COMPOSE_PROFILES="$COMPOSE_PROFILES,certbot"
+
+        elif [ "$USE_CERT" == "true" ]; then
+            log "TLS enabled with owned certificate. Starting Nginx without Certbot."
+
+            CERT_PATH="/etc/nginx/ssl/${SWIRL_FQDN}"
+            if [ -f "$CERT_PATH/ssl_certificate.crt" ] && [ -f "$CERT_PATH/ssl_certificate_key.key" ]; then
+                TEMPLATE_FILE="nginx/nginx.template.tls"
+                SNIPPET="ssl_certificate /etc/nginx/ssl/\${SWIRL_FQDN}/ssl_certificate.crt;"
+
+                if ! grep -Fq "$SNIPPET" "$TEMPLATE_FILE"; then
+                    awk '
+                    {
+                        if (prev ~ /listen 443 ssl;/ && $0 ~ /server_name .*;/) {
+                            print
+                            print ""
+                            print "    ssl_certificate /etc/nginx/ssl/${SWIRL_FQDN}/ssl_certificate.crt;"
+                            print "    ssl_certificate_key /etc/nginx/ssl/${SWIRL_FQDN}/ssl_certificate_key.key;"
+                        } else {
+                            print
+                        }
+                        prev = $0
+                    }
+                    ' "$TEMPLATE_FILE" > tmp && mv tmp "$TEMPLATE_FILE"
+                fi
+            else
+                echo "Certificate or key not found in '${CERT_PATH}'."
+            fi
+
+            cp nginx/nginx.template.tls nginx/nginx.template
         fi
-     done
-
-    # Download the TLS config files if not already present
-    if [ ! -f "$OPTIONS_FILE" ] || [ ! -f "$DHPARAMS_FILE" ]; then
-        echo "Downloading Certbot TLS config files..."
-
-        if command -v wget >/dev/null 2>&1; then
-            wget -P "$CERTBOT_SOURCE_DIR" https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
-            wget -P "$CERTBOT_SOURCE_DIR" https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem
-        elif command -v curl >/dev/null 2>&1; then
-            curl -o "$OPTIONS_FILE" https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
-            curl -o "$DHPARAMS_FILE" https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem
-        else
-            echo "Error: Neither wget nor curl is installed. Cannot fetch Certbot TLS configs."
-            exit 1
-        fi
+    else
+        log "TLS is disabled. Starting Nginx without TLS."
+        cp nginx/nginx.template.notls nginx/nginx.template
     fi
-
-    # Copy the files into each target directory
-    for DIR in $TARGET_LOCATIONS; do
-        mkdir -p "$DIR"
-        cp "$OPTIONS_FILE" "$DIR/"
-        cp "$DHPARAMS_FILE" "$DIR/"
-        echo "Copied TLS configs to $DIR"
-    done
-
-    # Copy the downloaded files into each target directory
-    for DIR in $TARGET_LOCATIONS; do
-        mkdir -p "$DIR"
-        cp "$OPTIONS_FILE" "$DIR/"
-        cp "$DHPARAMS_FILE" "$DIR/"
-        echo "Copied TLS configs to $DIR"
-    done
-
-    certbot certonly --standalone --email "$CERTBOT_EMAIL" --agree-tos --no-eff-email -d "$FQDN" --config-dir /app/nginx/certbot/conf
-    cp nginx/nginx.template.tls nginx/nginx.template
-    COMPOSE_PROFILES="$COMPOSE_PROFILES,certbot"
-    log "Will start Nginx with Certbot"
-elif [ "$USE_TLS" = "true" ]; then
-    log "Will start Nginx with Certbot (cert already present)"
-    cp nginx/nginx.template.tls nginx/nginx.template
-    COMPOSE_PROFILES="$COMPOSE_PROFILES,certbot"
 else
-    log "Will NOT use TLS or Certbot"
+    log "USE_NGINX is false. Nginx will not be started."
     cp nginx/nginx.template.notls nginx/nginx.template
 fi
 

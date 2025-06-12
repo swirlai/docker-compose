@@ -1,17 +1,6 @@
 #!/bin/bash
 set -e  # Exit the script immediately if any command fails
 
-# Helper function to update fields in the config JSON using jq
-function update_json() {
-  local file=$1
-  local jq_filter=$2
-  local tmp_file
-  tmp_file=$(mktemp)
-
-  # Apply the jq update and overwrite the original file
-  jq "$jq_filter" "$file" > "$tmp_file" && mv "$tmp_file" "$file"
-}
-
 echo "Setting up swirl"
 
 # Remove any existing swirl configuration directory
@@ -41,24 +30,7 @@ echo "msal and oauth config loading"
 CONFIG_DIR="/app/static/api/config"
 mkdir -p "$CONFIG_DIR"
 
-# Define the path for the default config file
-DEFAULT_CONFIG="$CONFIG_DIR/default"
-
-# Extract only the "default" part from the JSON configuration
-jq '.default' /app/config-swirl-demo.db.json > "$DEFAULT_CONFIG"
-
-# Apply environment variables to specific fields in the config JSON
-update_json "$DEFAULT_CONFIG" '.msalConfig.auth.redirectUri = "'"$MSAL_AUTH_REDIRECT_URI"'"'
-update_json "$DEFAULT_CONFIG" '.msalConfig.auth.clientId = "'"$MSAL_AUTH_CLIENT_ID"'"'
-update_json "$DEFAULT_CONFIG" '.msalConfig.auth.authority = "'"$MSAL_AUTH_AUTHORITY"'"'
-update_json "$DEFAULT_CONFIG" '.oauthConfig.issuer = "'"$OAUTH_CONFIG_ISSUER"'"'
-update_json "$DEFAULT_CONFIG" '.oauthConfig.redirectUri = "'"$OAUTH_CONFIG_REDIRECT_URI"'"'
-update_json "$DEFAULT_CONFIG" '.oauthConfig.clientId = "'"$OAUTH_CONFIG_CLIENT_ID"'"'
-update_json "$DEFAULT_CONFIG" '.oauthConfig.tokenEndpoint = "'"$OAUTH_CONFIG_TOKEN_ENDPOINT"'"'
-update_json "$DEFAULT_CONFIG" '.webSocketConfig.url = "'"$WEBSOCKET_URL"'"'
-update_json "$DEFAULT_CONFIG" '.webSocketConfig.timeout = "'"$WEBSOCKET_TIMEOUT"'"'
-update_json "$DEFAULT_CONFIG" '.shouldUseTokenFromOauth = true'
-update_json "$DEFAULT_CONFIG" '.swirlBaseURL = "http://localhost/swirl"'  # CHANGE_ME if deploying elsewhere
+python swirl.py config_default_api_settings
 
 echo "msal and oauth config loading completed"
 

@@ -33,11 +33,16 @@ trap cleanup TERM INT EXIT
 # Define sleep duration depending on OS (macOS `sleep` uses seconds, just like Linux)
 SLEEP_DURATION="43200"  # 12 hours in seconds
 
-while true; do
-  certbot renew --no-random-sleep-on-renew --config-dir /app/nginx/certbot/conf
+if [ "$USE_CERT" = "true" ]; then
+  echo "Using owned certificate. Not starting Certbot service."
+else
+  echo "Certbot is enabled. Starting the service..."
+  while true; do
+    certbot renew --no-random-sleep-on-renew --config-dir /app/nginx/certbot/conf
   
-  # Update liveness after each renewal attempt
-  update_liveness "healthy"
-  
-  sleep "$SLEEP_DURATION"
-done
+    # Update liveness after each renewal attempt
+    update_liveness "healthy"
+    
+    sleep "$SLEEP_DURATION"
+  done
+fi
