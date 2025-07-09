@@ -6,12 +6,6 @@ echo "Setting up swirl"
 # Remove any existing swirl configuration directory
 rm -rf .swirl
 
-# If the system uses APT (i.e., Ubuntu/Debian), update package list and install curl
-if command -v apt &>/dev/null; then
-  apt update
-  apt-get install -y curl
-fi
-
 # Collect Django static files and clear any previous ones
 python manage.py collectstatic --noinput --clear
 
@@ -21,7 +15,7 @@ if [ "$es_version" -eq 7 ]; then
   echo "Installing ES version 7"
   # If version is 7, uninstall default ES client and install specific compatible version
   pip uninstall elasticsearch --yes
-  pip install elasticsearch==7.10.1
+  pip install elasticsearch==7.17.12
 fi
 
 echo "msal and oauth config loading"
@@ -37,8 +31,6 @@ echo "msal and oauth config loading completed"
 # Wait for other services to initialize (e.g., database, search engines)
 sleep 30
 
-echo "Starting swirl"
-
 # Start background workers and the Daphne web server
-python swirl.py -d start celery-worker celery-healthcheck-worker celery-beats && \
-daphne -b 0.0.0.0 -p 8000 swirl_server.asgi:application
+echo "Starting swirl"
+python swirl.py start celery-worker celery-healthcheck-worker celery-beats && daphne -b 0.0.0.0 -p 8000 swirl_server.asgi:application;

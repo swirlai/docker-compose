@@ -3,7 +3,7 @@ Description=Swirl AI Connect
 After=network.target
 
 [Service]
-ExecStart=/bin/bash /app/swirl-service.sh
+ExecStart=/bin/bash /app/scripts/swirl-service.sh
 ExecStop=/usr/bin/docker compose --profile all stop
 WorkingDirectory=/app
 Restart=always
