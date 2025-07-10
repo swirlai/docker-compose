@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - develop
     paths:
       - '.github/workflows/integration-test.yml'
       - 'docker-compose.yml'
@@ -17,6 +18,8 @@ on:
       - 'docker-compose.yml'
       - 'nginx/nginx-*'
       - 'scripts/swirl-*'
+
+  workflow_dispatch:
 
 jobs:
   # get-docker-images:
