@@ -2,7 +2,7 @@
 These packages facilitate the updating of a docker-compose environment, such as the Swirl VM Offer.
 
 # Versions
-- [4.2.1](https://github.com/swirlai/docker-compose/blob/main/updaters/update_swirl_v4_2_1_0_6df2c40.tar.gz) supports updating the Swirl VM Offer from 4.0 - 4.2.0 to 4.2.1
+- [4.2.1](https://github.com/swirlai/docker-compose/blob/main/updaters/update_swirl_4_2_1_0_be59405.tar.gz) supports updating the Swirl VM Offer from 4.0 - 4.2.0 to 4.2.1
 
 # Usage
 
