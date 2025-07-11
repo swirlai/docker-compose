@@ -2,7 +2,7 @@
 These packages facilitate the updating of a docker-compose environment, such as the Swirl VM Offer.
 
 # Versions
-- [4.2.1](https://github.com/swirlai/docker-compose/blob/main/updaters/update_swirl_4_2_1_0_be59405.tar.gz) supports updating the Swirl VM Offer from 4.0 - 4.2.0 to 4.2.1
+- [4.2.1](https://github.com/swirlai/docker-compose/raw/main/updaters/update_swirl_4_2_1_0_be59405.tar.gz) supports updating the Swirl VM Offer from 4.0 - 4.2.0 to 4.2.1
 
 # Usage
 
@@ -28,4 +28,6 @@ This will perform the following actions:
 - Copy required updated files to `/app`, renaming existing with _backup suffix
 - Prompt operator to restart the Swirl services
 
+
+Please note: the updater results in storage of docker  credentials in `/root/.docker/config.json` which can be removed after the update is complete. 
 
