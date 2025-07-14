@@ -31,7 +31,7 @@ This will perform the following actions:
 - Prompt operator to authenticate with docker hub using
 - Pull the updated Swirl Docker images
 - Copy required updated files to `/app`, renaming existing with _backup suffix
-- Prompt operator to restart the Swirl services
+- Prompt operator to restart the Swirl services via `systemctl start swirl`
 
 
 Please note: the updater results in storage of docker  credentials in `/root/.docker/config.json` which can be removed after the update is complete. 
