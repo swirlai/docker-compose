@@ -31,7 +31,7 @@ This will perform the following actions:
 - Prompt operator to authenticate with docker hub using
 - Pull the updated Swirl Docker images
 - Copy required updated files to `/app`, renaming existing with _backup suffix
-- Prompt operator to restart the Swirl services via `systemctl start swirl`
+- Prompt operator to restart the Swirl services via `sudo systemctl start swirl`
 
 
 Please note: the updater results in storage of docker  credentials in `/root/.docker/config.json` which can be removed after the update is complete. 
@@ -44,10 +44,10 @@ the [Docker Hub instructions to create a PAT](https://docs.docker.com/security/f
 The basic process is as follows:
 1. Login to Docker Hub using the provided account invite
 2. Go to [Account Settings](https://hub.docker.com/settings/security)
-3. Create a new Personal Access Token (PAT) with the following scopes:
-   - `read:packages`
-4. Store that access token securely.
-5. Use the username and PAT to authenticate with the updater script when prompted.
+3. Go to the "Access Tokens" section
+4. Create a new Personal Access Token (PAT) with `Read-Only` scope (not the `Public Repo Read-Only` scope)
+5. Store that access token securely.
+6. Use the username and PAT to authenticate with the updater script when prompted.
 
 
 ## Restoring from Backup
