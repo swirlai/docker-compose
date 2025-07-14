@@ -34,3 +34,23 @@ This will perform the following actions:
 
 Please note: the updater results in storage of docker  credentials in `/root/.docker/config.json` which can be removed after the update is complete. 
 
+## Restoring from Backup
+To restore from the backup created during the update process, you can follow these steps:
+1. Determine the backup to user from `/app/backup`
+2. Restore the files from the backup:
+```bash
+sudo /app/restore.sh /app/backup/<backup-file>
+```
+
+The script will
+1. Stop the Swirl service
+2. Verify that the correct offline containers exist
+3. Use the `ADMIN_PASSWORD` from `/app/.env` to decrypt the database backup
+4. Start postgres and restore the database
+5. Restore the files from the backup
+6. Cleaup the unencrypted backup files
+
+After the restore is complete, you can restart the Swirl services via
+```bash
+sudo systemctl start swirl
+```
