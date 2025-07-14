@@ -52,7 +52,7 @@ The basic process is as follows:
 
 ## Restoring from Backup
 To restore from the backup created during the update process, you can follow these steps:
-1. Determine the backup to user from `/app/backup`
+1. Determine the backup to use from `/app/backup`
 2. Restore the files from the backup:
 ```bash
 sudo /app/restore.sh /app/backup/<backup-file>
