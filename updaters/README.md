@@ -1,10 +1,13 @@
 # Updaters
 These packages facilitate the updating of a docker-compose environment, such as the Swirl VM Offer.
 
-# Versions
+- [Versions](#versions)
+- [Usage](#usage)
+
+## Versions
 - [4.2.1](https://github.com/swirlai/docker-compose/raw/main/updaters/update_swirl_4_2_1_0_be59405.tar.gz) supports updating the Swirl VM Offer from 4.0 - 4.2.0 to 4.2.1
 
-# Usage
+## Usage
 
 1. Copy the updater to the VM /tmp directory
 2. Unpack the updater to the /app directory
