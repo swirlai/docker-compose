@@ -1,11 +1,14 @@
 ![Swirl](https://docs.swirl.today/images/transparent_header_3.png)
 
 # Swirl Enterprise Edition
+
 **Notice:** this repository is commercially licensed. A valid license key is required for use.
 Please contact [ hello@swirlaiconnect.com](mailto: hello@swirlaiconnect.com) for more information.
 
 # Installation
+
 ## Minimum System Requirements
+
 * **OS:** Linux platform (Ubuntu, RHEL) | MacOS X 1
 * **Processor:** +8 VCPU
 * **Memory:** +16 GB RAM
@@ -17,31 +20,37 @@ Please contact [ hello@swirlaiconnect.com](mailto: hello@swirlaiconnect.com) for
 ## Downloading Swirl Enterprise
 ### Installing Locally
 For proof-of-value (POV) engagements, Swirl recommends cloning this repository locally. Doing so enables Swirl to provide the fastest possible support during the integration period. To clone Swirl Enterprise Compose, run:
-```
-git clone -b develop https://github.com/swirlai/docker-compose-internal swirl-enterprise-compose
+
+```bash
+git clone -b develop https://github.com/swirlai/docker-compose swirl-enterprise-compose
 cd swirl-enterprise-compose
 ```
 
 See Configurations instructions below, after you have configured Swirl, you can run it with the following docker command:
-```
+
+```bash
 docker compose --profile all --env-file .env up -d
 ```
 
 ## Configuring Swirl Enterprise
 ### Licensing
 Add the license provided by Swirl, to the installation's `.env` file. It will be in the following format:
-```
+
+```env
 SWIRL_LICENSE='{"owner": "<owner-name>", "expiration": "<expiration-date>", "key": "<public-key>"}'
 ```
+
 Copy & paste this into the file exactly as it is. Swirl Enterprise will not operate without the correct license configuration.
 
 ### Database
+
 The local docker-compose.yml file for Swirl Enterprise is configured to use a local instance of PostgreSQL. If preferred, you can modify the compose file to connect to an external database service. For production environments, Swirl recommends using a dedicated PostgreSQL database.
 
 #### PostgreSQL
+
 Configure the database environment variables (referenced by a `# CHANGE_ME` comment) in the `.env` file before starting the application:
 
-```
+```env
 ADMIN_PASSWORD="" # CHANGE_ME  - Swirl application admin password
 SQL_HOST="postgres" # CHANGE_ME  - Swirl DB host name or domain name
 SQL_PORT="5432" # CHANGE_ME  - Swirl DB port
@@ -51,10 +60,31 @@ SQL_PASSWORD="" # CHANGE_ME  - Swirl DB User password
 
 > For more information see: [Admin Guide - Configuring Django](https://docs.swirl.today/Admin-Guide.html#configuring-django).
 
-# Connecting Swirl to the Enterprise
-## Connecting to Microsoft IDP
-If you will be using Microsoft as your IDP, configure the following environment variables in the `.env` file:
+### TLS Configuration with Let's Encrypt & Certbot (optional)
+
+If you want to enable HTTPS using Nginx and Certbot without an existing TLS certificate, you must download the following files required by Certbot to securely configure TLS via Let's Encrypt:
+
+Run the following commands from your project root:
+
+```bash
+mkdir -p certbot/conf
+
+curl -o certbot/conf/options-ssl-nginx.conf https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
+
+curl -o certbot/conf/ssl-dhparams.pem https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem
 ```
+
+These files are required for secure SSL configuration and are referenced in your Nginx configuration when using Certbot with Let's Encrypt.
+
+After downloading, follow Certbot setup instructions or use a Swirl-provided reverse proxy template to automate certificate issuance.
+
+# Connecting Swirl to the Enterprise
+
+## Connecting to Microsoft IDP
+
+If you will be using Microsoft as your IDP, configure the following environment variables in the `.env` file:
+
+```env
 OAUTH_CONFIG_ISSUER=''              ## Base URL of the OIDC provider (e.g., Microsoft Entra ID). Used to fetch discovery metadata.
 OAUTH_CONFIG_REDIRECT_URI=''        ## URL where the provider will redirect after authentication (must match app registration).
 OAUTH_CONFIG_CLIENT_ID=''           ## The client (application) ID registered with the identity provider.

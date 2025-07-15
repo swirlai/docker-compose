@@ -12,7 +12,7 @@ function update_json() {
 }
 
 # Create a Django superuser using environment variables for email and password
-DJANGO_SUPERUSER_PASSWORD=$ADMIN_PASSWORD python manage.py createsuperuser --email "$ADMIN_USER_EMAIL" --username admin --noinput
+DJANGO_SUPERUSER_PASSWORD=$ADMIN_PASSWORD python manage.py createsuperuser --email $ADMIN_USER_EMAIL --username admin --noinput;
 
 # Check if MSAL configuration is present
 if [ -n "$MSAL_AUTH_REDIRECT_URI" ]; then
@@ -33,9 +33,10 @@ if [ -n "$MSAL_AUTH_REDIRECT_URI" ]; then
     AUTH_TARGET="/app/swirl/fixtures/DefaultAuthenticators.json"
 
     # Update authenticator config with values from environment variables
+    update_json "$AUTH_TARGET" '.[0].fields.active = "'"true"'"'
     update_json "$AUTH_TARGET" '.[0].fields.client_id = "'"$MICROSOFT_CLIENT_ID"'"'
     update_json "$AUTH_TARGET" '.[0].fields.client_secret = "'"$MICROSOFT_CLIENT_SECRET"'"'
-    update_json "$AUTH_TARGET" '.[0].fields.app_uri = "https://'"$FQDN"'"'
+    update_json "$AUTH_TARGET" '.[0].fields.app_uri = "https://'"$SWIRL_FQDN"'"'
     update_json "$AUTH_TARGET" '.[0].fields.auth_uri = "'"$MSAL_AUTH_AUTHORITY"'"'
     update_json "$AUTH_TARGET" '.[0].fields.token_uri = "'"$OAUTH_CONFIG_TOKEN_ENDPOINT"'"'
   else
