@@ -29,6 +29,16 @@ cleanup() {
 }
 
 restore_db() {
+    # start postgres
+    if [ "$USE_LOCAL_POSTGRES" == "true" ]; then
+        info "Starting local Postgres."
+        pushd /app
+        COMPOSE_PROFILES=db docker compose up --pull never -d
+        popd
+        info "Started local Postgres."
+        sleep 15
+    fi
+
   # Locate the latest SQL dump file
   DUMPFILE=$(ls -rt $WORKING_DIR/sql/swirl*sql|tail -n 1)
   if [ -z "$DUMPFILE" ]; then
@@ -63,26 +73,7 @@ restore_db() {
     pg_restore $CLEAN_FLAG -h postgres -U postgres -d swirl -c $DUMPFILE
 }
 
-function stop_swirl_app() {
-  if docker ps --format '{{.Names}}' | grep -q swirl_app; then
-    info "Stopping swirl_app container"
-    docker stop swirl_app
-  else
-    info "swirl_app container is not running."
-  fi
-}
-
-function start_swirl_app() {
-  if docker ps -a --format '{{.Names}}' | grep -q swirl_app; then
-      info "swirl_app container exists. Starting it now."
-    docker start swirl_app
-  else
-    error "swirl_app container does not exist. Please start the swirl services first."
-  fi
-}
-
 function check_environment() {
-
   # does swirl_postgres container exist?
   if ! docker ps -a --format '{{.Names}}' | grep -q swirl_postgres; then
     error "swirl_postgres container does not exist. Please start the swirl services first."
@@ -92,13 +83,7 @@ function check_environment() {
   if ! docker ps -a --format '{{.Names}}' | grep -q swirl_app; then
     error "swirl_app container does not exist. Please start the swirl services first."
   fi
-
-  # is swirl_postgres running?
-  if ! docker ps --format '{{.Names}}' | grep -q swirl_postgres; then
-    info "swirl_postgres container is not running. Starting it now."
-    docker stop swirl_postgres
-  fi
-}
+ }
 
 function unpack_archive() {
   : ${ENCRYPTION_PASSWORD:="$ADMIN_PASSWORD"}
@@ -140,7 +125,9 @@ info "  TAR_FILE: $TAR_FILE"
 
 
 trap 'cleanup' ERR
-
+# stop Swirl to get a consistent backup
+# and to prevent auto restart of containers
+systemctl stop swirl
 check_environment
 unpack_archive
 restore_db

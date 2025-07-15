@@ -41,7 +41,15 @@ function cleanup() {
 }
 
 function backup_db() {
-    stop_swirl_app
+    # start postgres
+    if [ "$USE_LOCAL_POSTGRES" == "true" ]; then
+        info "Starting local Postgres."
+        pushd /app
+        COMPOSE_PROFILES=db docker compose up --pull never -d
+        popd
+        info "Started local Postgres."
+        sleep 15
+    fi
 
     info "Starting backup of $SQL_DATABASE to $SQL_DUMP_ENV_FILE"
     pushd $WORKING_DIR
@@ -50,8 +58,6 @@ function backup_db() {
       -e PGPASSWORD=$SQL_PASSWORD \
       postgres:15 \
       pg_dump -h postgres -U postgres -d swirl -F c > $SQL_DUMP_ENV_FILE
-
-      start_swirl_app
 }
 
 function backup_files() {
@@ -72,26 +78,7 @@ function package_archive() {
 
 }
 
-function stop_swirl_app() {
-  if docker ps --format '{{.Names}}' | grep -q swirl_app; then
-    info "Stopping swirl_app container"
-    docker stop swirl_app
-  else
-    info "swirl_app container is not running."
-  fi
-}
-
-function start_swirl_app() {
-  if docker ps -a --format '{{.Names}}' | grep -q swirl_app; then
-      info "swirl_app container exists. Starting it now."
-    docker start swirl_app
-  else
-    error "swirl_app container does not exist. Please start the swirl services first."
-  fi
-}
-
 function check_environment() {
-
   # does swirl_postgres container exist?
   if ! docker ps -a --format '{{.Names}}' | grep -q swirl_postgres; then
     error "swirl_postgres container does not exist. Please start the swirl services first."
@@ -102,16 +89,9 @@ function check_environment() {
     error "swirl_app container does not exist. Please start the swirl services first."
   fi
 
-  # is swirl_postgres running?
-  if ! docker ps --format '{{.Names}}' | grep -q swirl_postgres; then
-    info "swirl_postgres container is not running. Starting it now."
-    docker start swirl_postgres
-  fi
-
   # Create directories
   mkdir -p $BACKUP_DIR
   mkdir -p $WORKING_DIR/sql
-
 }
 
 # ----------------------
@@ -130,8 +110,15 @@ info "  TAR_FILE: $TAR_FILE"
 
 trap 'cleanup' ERR
 
+# stop Swirl to get a consistent backup
+# and to prevent auto restart of containers
+systemctl stop swirl
+
 check_environment
 backup_db
 backup_files
 package_archive
 cleanup
+
+# Restart Swirl service
+systemctl start swirl
