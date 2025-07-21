@@ -3,95 +3,53 @@
 # Swirl Enterprise Edition
 
 **Notice:** this repository is commercially licensed. A valid license key is required for use.
-Please contact [ hello@swirlaiconnect.com](mailto: hello@swirlaiconnect.com) for more information.
+Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for more information.
+
+# Table of Contents
+1. [Installation](#installation)
+    - [Minimum System Requirements](#minimum-system-requirements)
+    - [Installation Steps](#installation-steps)
+    - [Configuring Swirl Enterprise](#configuring-swirl-enterprise)
+    - [Controlling and Monitoring Swirl Service](#controlling-and-monitoring-swirl-service)
+2. [Additional Documentation](#additional-documentation)
+3. [Support](#support)
 
 # Installation
 
 ## Minimum System Requirements
 
-* **OS:** Linux platform (Ubuntu, RHEL) | MacOS X 1
+* **OS:** Linux platform (Ubuntu, RHEL)
 * **Processor:** +8 VCPU
 * **Memory:** +16 GB RAM
 * **Storage:** 500 GB available space
-* **Docker**: 28 or later
+* **Docker**: v28 or later
 
 > **Note:** Swirl does support use of a proxy server between Swirl and target systems. Refer to section TBD for more information.
 
-## Downloading Swirl Enterprise
-### Installing Locally
-For proof-of-value (POV) engagements, Swirl recommends cloning this repository locally. Doing so enables Swirl to provide the fastest possible support during the integration period. To clone Swirl Enterprise Compose, run:
+## Installation Steps
+- [Downloading Swirl Enterprise](doc/downloading-swirl-enterprise-docker-environment.md)
+- [Setting up Docker Support on Host OS](doc/docker-package-setup-ubuntu.md)
+- [Setting up the Swirl Service](doc/service-setup.md)
+- [Controlling Swirl Service](doc/controlling-swirl-service.md)
 
-```bash
-git clone -b develop https://github.com/swirlai/docker-compose-internal swirl-enterprise-compose
-cd swirl-enterprise-compose
-```
-
-See Configurations instructions below, after you have configured Swirl, you can run it with the following docker command:
-
-```bash
-docker compose --profile all --env-file .env up -d
-```
 
 ## Configuring Swirl Enterprise
-### Licensing
-Add the license provided by Swirl, to the installation's `.env` file. It will be in the following format:
+- [TLS Scenarios](doc/service-setup.md#tls-scenarios)
+    - [No TLS](doc/service-setup.md#no-tls)
+    - [Bring Your Own Certificate (BYOC)](doc/service-setup.md#bring-your-own-certificate-byoc)
+    - [TLS Configuration with Let's Encrypt & Certbot (optional)](doc/service-setup.md#tls-configuration-with-lets-encrypt--certbot-optional)
+- [License](doc/service-setup.md#licensing)
+- [Database](doc/service-setup.md#database) 
+    - [PostgreSQL](doc/service-setup.md#postgresql)
+- [Connecting Swirl to the Enterprise](doc/service-setup.md#connecting-swirl-to-the-enterprise)
+    - [Connecting to Microsoft IDP](doc/service-setup.md#connecting-to-microsoft-idp)
 
-```env
-SWIRL_LICENSE='{"owner": "<owner-name>", "expiration": "<expiration-date>", "key": "<public-key>"}'
-```
-
-Copy & paste this into the file exactly as it is. Swirl Enterprise will not operate without the correct license configuration.
-
-### Database
-
-The local docker-compose.yml file for Swirl Enterprise is configured to use a local instance of PostgreSQL. If preferred, you can modify the compose file to connect to an external database service. For production environments, Swirl recommends using a dedicated PostgreSQL database.
-
-#### PostgreSQL
-
-Configure the database environment variables (referenced by a `# CHANGE_ME` comment) in the `.env` file before starting the application:
-
-```env
-ADMIN_PASSWORD="" # CHANGE_ME  - Swirl application admin password
-SQL_HOST="postgres" # CHANGE_ME  - Swirl DB host name or domain name
-SQL_PORT="5432" # CHANGE_ME  - Swirl DB port
-SQL_USER="" # CHANGE_ME - Swirl DB User name
-SQL_PASSWORD="" # CHANGE_ME  - Swirl DB User password
-```
-
-> For more information see: [Admin Guide - Configuring Django](https://docs.swirl.today/Admin-Guide.html#configuring-django).
-
-### TLS Configuration with Let's Encrypt & Certbot (optional)
-
-If you want to enable HTTPS using Nginx and Certbot without an existing TLS certificate, you must download the following files required by Certbot to securely configure TLS via Let's Encrypt:
-
-Run the following commands from your project root:
-
-```bash
-mkdir -p certbot/conf
-
-curl -o certbot/conf/options-ssl-nginx.conf https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
-
-curl -o certbot/conf/ssl-dhparams.pem https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem
-```
-
-These files are required for secure SSL configuration and are referenced in your Nginx configuration when using Certbot with Let's Encrypt.
-
-After downloading, follow Certbot setup instructions or use a Swirl-provided reverse proxy template to automate certificate issuance.
-
-# Connecting Swirl to the Enterprise
-
-## Connecting to Microsoft IDP
-
-If you will be using Microsoft as your IDP, configure the following environment variables in the `.env` file:
-
-```env
-OAUTH_CONFIG_ISSUER=''              ## Base URL of the OIDC provider (e.g., Microsoft Entra ID). Used to fetch discovery metadata.
-OAUTH_CONFIG_REDIRECT_URI=''        ## URL where the provider will redirect after authentication (must match app registration).
-OAUTH_CONFIG_CLIENT_ID=''           ## The client (application) ID registered with the identity provider.
-OAUTH_CONFIG_TOKEN_ENDPOINT=''      ## OAuth 2.0 token endpoint URL for exchanging authorization code for tokens.
-OAUTH_CONFIG_USER_INFO_ENDPOINT=''  ## Endpoint to fetch authenticated user's profile information (e.g., name, email).
-```
-
+## Controlling and Monitoring Swirl Service
+- [Controlling Swirl Service](doc/controlling-swirl-service.md)
+    - Start, stop, and restart the Swirl service.
+    - View logs and status of the service.
+    - Manage service configuration.
+    
 # Additional Documentation
 
 [Overview](https://docs.swirlaiconnect.com/) | [Quick Start](https://docs.swirlaiconnect.com/Quick-Start) | [User Guide](https://docs.swirlaiconnect.com/User-Guide) | [Admin Guide](https://docs.swirlaiconnect.com/Admin-Guide) | [M365 Guide](https://docs.swirlaiconnect.com/M365-Guide) | [Developer Guide](https://docs.swirlaiconnect.com/Developer-Guide) | [Developer Reference](https://docs.swirlaiconnect.com/Developer-Reference) | [AI Guide](https://docs.swirlaiconnect.com/AI-Guide)

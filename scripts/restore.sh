@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-export ENV_FILE="/app/.env"
+# Global variables
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export SCRIPT_DIR
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+PARENT_DIR_NAME="$(basename "$PARENT_DIR")"
+export PARENT_DIR PARENT_DIR_NAME
+
 WORKING_DIR=/tmp/backup$(basename "$BACKUP_FILE"| sed 's/\.tar\.gz$//')
 export WORKING_DIR
 
@@ -32,7 +38,7 @@ restore_db() {
     # start postgres
     if [ "$USE_LOCAL_POSTGRES" == "true" ]; then
         info "Starting local Postgres."
-        pushd /app
+        pushd $PARENT_DIR
         COMPOSE_PROFILES=db docker compose up --pull never -d
         popd
         info "Started local Postgres."
@@ -48,7 +54,7 @@ restore_db() {
 
   # Check if the database has user tables
   TABLE_COUNT=$(docker run --rm \
-    --network=app_swirl \
+    --network=swirl_network \
     -e PGPASSWORD=$SQL_PASSWORD \
     postgres:15 \
     psql -h postgres -U postgres -d swirl -t -c "SELECT count(*) FROM pg_tables WHERE schemaname='public';" | xargs)
@@ -64,7 +70,7 @@ restore_db() {
   info "Restoring database from $DUMPFILE"
 
   docker run --rm \
-    --network=app_swirl \
+    --network=swirl_network \
     -e PGPASSWORD=$SQL_PASSWORD \
     -e WORKING_DIR=$WORKING_DIR \
     -e DUMPFILE=$DUMPFILE \
@@ -102,10 +108,14 @@ function unpack_archive() {
 # ----------------------
 
 # variables from env
+# variables from env
+ENV_FILE="${PARENT_DIR}/.env"
+export ENV_FILE
+
 if [ ! -f $ENV_FILE ]; then
-    error "Environment file /app/.env not found. Exiting."
+    error "Environment file $ENV_FILE not found. Exiting."
 fi
-source /app/.env
+source $ENV_FILE
 
 export BACKUP_FILE=$1
 if [ ! -f "$BACKUP_FILE" ]; then
@@ -116,12 +126,8 @@ fi
 
 # print environment variables
 info "Environment variables:"
-info "  BACKUP_DIR: $BACKUP_DIR"
-info "  DATESTAMP: $DATESTAMP"
 info "  ENV_FILE: $ENV_FILE"
 info "  WORKING_DIR: $WORKING_DIR"
-info "  SQL_FILE: $SQL_FILE"
-info "  TAR_FILE: $TAR_FILE"
 
 
 trap 'cleanup' ERR
@@ -132,7 +138,14 @@ check_environment
 unpack_archive
 restore_db
 
-info "Restoring application files from $WORKING_DIR/app"
-rsync -rvlHtogpc $WORKING_DIR/app /
 
+info "Restoring application files from $WORKING_DIR"
+# Clear all but the files for restoration
+rm -rf $WORKING_DIR/sql
+rm -f $WORKING_DIR/backup.tar.gz
+
+# Restore files
+rsync -rvlHtogpc $WORKING_DIR/ /
+
+info "Restore complete"
 cleanup

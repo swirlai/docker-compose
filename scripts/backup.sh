@@ -1,17 +1,28 @@
 #!/usr/bin/env bash
 set -e
 
-# variables from env
-if [ ! -f $ENV_FILE ]; then
-    error "Environment file /app/.env not found. Exiting."
-fi
-source /app/.env
-
 # Global variables
-export BACKUP_DIR="/app/backups"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export SCRIPT_DIR
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+PARENT_DIR_NAME="$(basename "$PARENT_DIR")"
+export PARENT_DIR PARENT_DIR_NAME
+
+BACKUP_DIR="${PARENT_DIR}/backups"
 DATESTAMP=$(date +%Y-%b-%d-%H%M)
-export DATESTAMP
-export ENV_FILE="/app/.env"
+export BACKUP_DIR DATESTAMP
+
+# variables from env
+ENV_FILE="${PARENT_DIR}/.env"
+export ENV_FILE
+
+if [ ! -f $ENV_FILE ]; then
+    error "Environment file $ENV_FILE not found. Exiting."
+fi
+source $ENV_FILE
+
+
+
 export WORKING_DIR=/tmp/backup.$DATESTAMP
 # files for process
 export SQL_DUMP_ENV_FILE=sql/$SQL_DATABASE-$DATESTAMP.sql
@@ -44,7 +55,7 @@ function backup_db() {
     # start postgres
     if [ "$USE_LOCAL_POSTGRES" == "true" ]; then
         info "Starting local Postgres."
-        pushd /app
+        pushd $PARENT_DIR
         COMPOSE_PROFILES=db docker compose up --pull never -d
         popd
         info "Started local Postgres."
@@ -54,20 +65,22 @@ function backup_db() {
     info "Starting backup of $SQL_DATABASE to $SQL_DUMP_ENV_FILE"
     pushd $WORKING_DIR
     docker run --rm \
-      --network=app_swirl \
+      --network=swirl_network \
       -e PGPASSWORD=$SQL_PASSWORD \
       postgres:15 \
       pg_dump -h postgres -U postgres -d swirl -F c > $SQL_DUMP_ENV_FILE
 }
 
 function backup_files() {
-  info "Copying /app/ directory to $WORKING_DIR"
-  rsync -rvlHtogpc --exclude='backups/*' /app/ $WORKING_DIR/app/
+  info "Copying $PARENT_DIR directory to $WORKING_DIR"
+  FILE_BACKUP_DIR=$WORKING_DIR/$(dirname "$PARENT_DIR")
+  mkdir -p $FILE_BACKUP_DIR
+  rsync -rvlHtogpc --exclude='backups/*' $PARENT_DIR $FILE_BACKUP_DIR
 }
 
 function package_archive() {
   info "Compressing $WORKING_DIR into $TAR_FILE"
-  tar cfz $TAR_FILE app sql
+  tar cfz $TAR_FILE *
   info "Encrypting backup file $TAR_FILE"
    : ${ENCRYPTION_PASSWORD:="$ADMIN_PASSWORD"}
   echo $ENCRYPTION_PASSWORD | gpg --batch --yes --passphrase-fd 0 --symmetric --cipher-algo AES256 $TAR_FILE

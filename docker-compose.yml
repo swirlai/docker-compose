@@ -142,7 +142,10 @@ services:
 
 volumes:
   db_data:
+    driver: local
+    name: swirl_db_data
 
 networks:
   swirl:
     driver: bridge
+    name: swirl_network

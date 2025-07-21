@@ -3,12 +3,12 @@ Description=Swirl AI Connect
 After=network.target
 
 [Service]
-ExecStart=/bin/bash /app/scripts/swirl-service.sh
+ExecStart=/bin/bash {{WORKING_DIRECTORY}}/scripts/swirl-service.sh
 ExecStop=/usr/bin/docker compose --profile all stop
-WorkingDirectory=/app
+WorkingDirectory={{WORKING_DIRECTORY}}
 Restart=always
 User=root
-EnvironmentFile=/app/.env
+EnvironmentFile={{WORKING_DIRECTORY}}/.env
 
 [Install]
 WantedBy=multi-user.target
