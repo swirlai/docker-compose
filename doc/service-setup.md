@@ -28,7 +28,7 @@ If you do not already have credentials for the Swirl Enterprise Docker registry,
 you can obtain them by contacting Swirl support(via [email](mailto:hello@swirlaiconnect.com) or [ticket](https://swirlaiconnect.com/support-ticket).
 
 - [Generate a personal access token (PAT)](https://docs.docker.com/security/access-tokens/)
-- Login to the Swirl Enterprise Docker registry either manually or via the [scripts/docker_login.sh](../scripts/docker-login.sh) script
+- Login to the Swirl Enterprise Docker registry either manually or via the [scripts/docker_login.sh](../scripts/docker_login.sh) script
 
 This will cache authentication credentials in the Docker configuration file, allowing the service to pull images from the Swirl
 Enterprise Docker registry without requiring manual login each time.
