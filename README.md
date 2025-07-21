@@ -52,9 +52,10 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
     
 # Additional Documentation
 
-[Overview](https://docs.swirlaiconnect.com/) | [Quick Start](https://docs.swirlaiconnect.com/Quick-Start) | [User Guide](https://docs.swirlaiconnect.com/User-Guide) | [Admin Guide](https://docs.swirlaiconnect.com/Admin-Guide) | [M365 Guide](https://docs.swirlaiconnect.com/M365-Guide) | [Developer Guide](https://docs.swirlaiconnect.com/Developer-Guide) | [Developer Reference](https://docs.swirlaiconnect.com/Developer-Reference) | [AI Guide](https://docs.swirlaiconnect.com/AI-Guide)
+[Overview](https://docs.swirlaiconnect.com/) | [Quick Start](https://docs.swirlaiconnect.com/Quick-Start) | [User Guide](https://docs.swirlaiconnect.com/User-Guide) | [Admin Guide](https://docs.swirlaiconnect.com/Admin-Guide) | [M365 Guide](https://docs.swirlaiconnect.com/M365-Guide) | [Developer Guide](https://docs.swirlaiconnect.com/Developer-Guide) | [Developer Reference](https://docs.swirlaiconnect.com/Developer-Reference) | [AI Search Guide](https://docs.swirlaiconnect.com/AI-Search.html) | [AI Search Assistant Guide](https://docs.swirlaiconnect.com/AI-Search-Assistant.html)
 
 # Support
 
 For general support, please use the private Slack or Microsoft Teams channel connecting Swirl and your company.
 To report an issue please [create a ticket](https://swirlaiconnect.com/support-ticket).
+
