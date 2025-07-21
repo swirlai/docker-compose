@@ -190,7 +190,7 @@ if [ "$USE_NGINX" == "true" ]; then
                 }
                 ' "$TEMPLATE_FILE" > tmp && mv tmp "$TEMPLATE_FILE"
             fi
-
+            
             OPTIONS_FILE="$PARENT_DIR/certbot/conf/options-ssl-nginx.conf"
             DHPARAMS_FILE="$PARENT_DIR/certbot/conf/ssl-dhparams.pem"
 
