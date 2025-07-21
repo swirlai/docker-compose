@@ -1,5 +1,10 @@
 #!/bin/bash
-set -e  # Exit immediately if a command exits with a non-zero status
+
+# Exit immediately if a command exits with a non-zero status
+set -e
+
+# Disable X11 for GUI apps to avoid DBUS-related issues
+export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 # Logging function
 function log() {
@@ -11,16 +16,19 @@ function error() {
     echo "[$(date +%Y-%m-%dT%H:%M:%S) ${STAGE} ERROR] $1"
 }
 
-# Disable X11 for GUI apps to avoid DBUS-related issues
-export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 # Ensure log directory exists and redirect output to log file
 mkdir -p /var/log/swirl
 exec > >(tee -a /var/log/swirl/swirl.log) 2>&1
 
-FLAG_FILE="./swirl_job.flag"
-ENV_FILE="./.env"
-EXAMPLE_ENV_FILE="/app/.env.example"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+log "Script directory: $SCRIPT_DIR"
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+log "Parent directory: $PARENT_DIR"
+
+SERVICE_SETUP_FLAG="$PARENT_DIR/.swirl-service-setup-complete.flag"
+ENV_FILE="$PARENT_DIR/.env"
+EXAMPLE_ENV_FILE="$PARENT_DIR/.env.example"
 
 # Create .env file from example if not present
 if [ ! -f "$ENV_FILE" ]; then
@@ -40,108 +48,226 @@ fi
 # Load environment variables from .env
 source "$ENV_FILE"
 
-# Stop previously running swirl containers
-log "Stopping any swirl containers from previous run"
-docker compose --profile all stop || true
-
-COMPOSE_PROFILES="svc"  # Base profile for Swirl services
-
-# Conditionally add local Postgres
-if [ "$USE_LOCAL_POSTGRES" = "true" ]; then
-    log "Enabling local Postgres profile."
-    COMPOSE_PROFILES="$COMPOSE_PROFILES,local-postgres"
+# Check Properly Configured Environment Variables
+if [ -z "$SWIRL_FQDN" ]; then
+    error "SWIRL_FQDN is not set in .env file. Please set it to your domain name."
+    exit 1
 fi
-
-# Conditionally add Nginx
-if [ "$USE_NGINX" = "true" ]; then
-    log "Enabling Nginx profile."
-    COMPOSE_PROFILES="$COMPOSE_PROFILES,nginx"
-fi
-
-# Handle TLS and Certbot setup
-if [ "$USE_TLS" = "true" ] && [ ! -f "nginx/certbot/conf/live/$FQDN/privkey.pem" ]; then
-    log "Issuing certificate using Certbot."
-    log "Waiting DNS propagation..."
-    sleep 300
-
-    # Paths
-    CERTBOT_SOURCE_DIR="/app/nginx/certbot/conf"
-    OPTIONS_FILE="$CERTBOT_SOURCE_DIR/options-ssl-nginx.conf"
-    DHPARAMS_FILE="$CERTBOT_SOURCE_DIR/ssl-dhparams.pem"
-
-    # Directories to copy the configs into
-    TARGET_LOCATIONS="/etc/letsencrypt /app/nginx/certbot/conf /etc/nginx/ssl"
-
-    # Ensure source directory exists
-    for dir in $TARGET_LOCATIONS; do
-        if [ ! -d "$dir" ]; then
-            mkdir -p "$dir"
-            echo "Created directory: $dir"
-        else
-            echo "Directory already exists: $dir"
-        fi
-     done
-
-    # Download the TLS config files if not already present
-    if [ ! -f "$OPTIONS_FILE" ] || [ ! -f "$DHPARAMS_FILE" ]; then
-        echo "Downloading Certbot TLS config files..."
-
-        if command -v wget >/dev/null 2>&1; then
-            wget -P "$CERTBOT_SOURCE_DIR" https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
-            wget -P "$CERTBOT_SOURCE_DIR" https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem
-        elif command -v curl >/dev/null 2>&1; then
-            curl -o "$OPTIONS_FILE" https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
-            curl -o "$DHPARAMS_FILE" https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem
-        else
-            echo "Error: Neither wget nor curl is installed. Cannot fetch Certbot TLS configs."
-            exit 1
-        fi
-    fi
-
-    # Copy the files into each target directory
-    for DIR in $TARGET_LOCATIONS; do
-        mkdir -p "$DIR"
-        cp "$OPTIONS_FILE" "$DIR/"
-        cp "$DHPARAMS_FILE" "$DIR/"
-        echo "Copied TLS configs to $DIR"
-    done
-
-    # Copy the downloaded files into each target directory
-    for DIR in $TARGET_LOCATIONS; do
-        mkdir -p "$DIR"
-        cp "$OPTIONS_FILE" "$DIR/"
-        cp "$DHPARAMS_FILE" "$DIR/"
-        echo "Copied TLS configs to $DIR"
-    done
-
-    certbot certonly --standalone --email "$CERTBOT_EMAIL" --agree-tos --no-eff-email -d "$FQDN" --config-dir /app/nginx/certbot/conf
-    cp nginx/nginx.template.tls nginx/nginx.template
-    COMPOSE_PROFILES="$COMPOSE_PROFILES,certbot"
-    log "Will start Nginx with Certbot"
-elif [ "$USE_TLS" = "true" ]; then
-    log "Will start Nginx with Certbot (cert already present)"
-    cp nginx/nginx.template.tls nginx/nginx.template
-    COMPOSE_PROFILES="$COMPOSE_PROFILES,certbot"
-else
-    log "Will NOT use TLS or Certbot"
-    cp nginx/nginx.template.notls nginx/nginx.template
+if [ -z "$SWIRL_VERSION" ] || [ -z "$TIKA_VERSION" ] || [ -z "$TTM_VERSION" ]; then
+    error "SWIRL_VERSION, TIKA_VERSION, and TTM_VERSION must all be set in .env file."
+    exit 1
 fi
 
 # First-time setup detection
-if [ ! -f "$FLAG_FILE" ]; then
-    log "First time execution."
-    if command -v systemctl >/dev/null 2>&1; then
-        log "Enabling Swirl service to start on boot..."
-        systemctl enable swirl
-    else
-        log "Skipping systemctl - not available on this platform."
-    fi
-    COMPOSE_PROFILES="$COMPOSE_PROFILES,setup"
-    touch "$FLAG_FILE"
-else
+if [ -f "$SERVICE_SETUP_FLAG" ]; then
     log "Not first time execution."
+else
+    if [ "$USE_TLS" == "true" ]; then
+        if [ "$USE_CERT" == "false" ]; then
+            OPTIONS_FILE="$PARENT_DIR/certbot/conf/options-ssl-nginx.conf"
+            DHPARAMS_FILE="$PARENT_DIR/certbot/conf/ssl-dhparams.pem"
+
+            # Fetch certbot configuration files if necessary
+            if [ -f "$OPTIONS_FILE" ] && [ -f "$DHPARAMS_FILE" ]; then
+                log "Setup: Certbot configuration files already exist."
+            else
+                log "Setup:Fetching Certbot configuration files..."
+                if [ ! $(which curl) ]; then
+                    error "Setup: curl is not installed. Please install curl to fetch Certbot configuration files or Install them manually (see 'TLS Configuration with Let's Encrypt & Certbot (optional)' section of Readme)"
+                fi
+                mkdir -p "$PARENT_DIR/certbot/conf"
+                curl -o "$PARENT_DIR/certbot/conf/options-ssl-nginx.conf" https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
+                curl -o  "$PARENT_DIR/certbot/conf/ssl-dhparams.pem" https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem
+            fi
+        fi
+    fi
+
+    # check for local images
+    if docker inspect "swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}" > /dev/null 2>&1; then
+        log "Setup: Found local Swirl image swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}"
+    else
+        log "Setup: Local Swirl image swirlai/release-swirl-search-enterprise:${SWIRL_VERSION} not found. Pulling images from Docker Hub."
+        docker compose --profile all pull --quiet
+    fi
+
+    log "Setup:  Setup starting"
+    log "Setup: Enabling Swirl service to start on boot..."
+
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        log "Setup: Running on Linux."
+
+        if [ ! -f "/etc/systemd/system/swirl.service" ]; then
+            log "Setup: Copying swirl.service to /etc/systemd/system/"
+            TEMPLATE_FILE="$SCRIPT_DIR/swirl.service.template"
+            TARGET_FILE="/etc/systemd/system/swirl.service"
+
+            if [ -f "$TEMPLATE_FILE" ]; then
+                sed -e "s|{{WORKING_DIRECTORY}}|$PARENT_DIR|g" \
+                    "$TEMPLATE_FILE" > "$TARGET_FILE"
+                log "Setup: swirl.service generated and copied to /etc/systemd/system/"
+            else
+                error "Setup: swirl.service.template not found in $SCRIPT_DIR."
+            fi
+            systemctl daemon-reload
+        else
+            log "Setup: swirl.service already exists in /etc/systemd/system/"
+        fi
+        systemctl enable swirl
+
+        log "Start Service via: systemctl start swirl "
+        log "Monitor Service via: journalctl -u swirl"
+
+    else
+        error "Setup: Unsupported OS: $OSTYPE"
+    fi
+    # prevent setup on subsequent runs
+    touch "$SERVICE_SETUP_FLAG"
+    log "Setup: Setup complete"
+    exit 0
+fi
+
+# Base profile for Swirl services
+COMPOSE_PROFILES=svc
+
+
+# Stop previously running Swirl containers
+log "Stopping any Swirl containers from previous run"
+docker compose --profile all stop
+
+# Conditionally add local Postgres
+if [ "$USE_LOCAL_POSTGRES" == "true" ]; then
+    log "Local Postgres is enabled. Starting service."
+    (COMPOSE_PROFILES=db docker compose up --pull never -d)
+    log "Started local Postgres service."
+    sleep 15
+fi
+
+# Conditionally add Nginx and Certbot
+if [ "$USE_NGINX" == "true" ]; then
+    log "Enabling Nginx profile."
+    COMPOSE_PROFILES="$COMPOSE_PROFILES,nginx"
+
+    if [ "$USE_TLS" == "true" ]; then
+        if [ "$USE_CERT" == "false" ]; then
+            log "TLS enabled with Certbot. Starting Nginx and Certbot."
+            log "Issuing certificate using Certbot."
+
+            log "Waiting DNS propagation before Certbot request..."
+            MAX_WAIT=300
+            WAITED=0
+            while ! nslookup  "$SWIRL_FQDN" >/dev/null; do
+                if [ "$WAITED" -ge "$MAX_WAIT" ]; then
+                    error "DNS name $SWIRL_FQDN did not resolve after $MAX_WAIT seconds."
+                    exit 1
+                fi
+                sleep 1
+                WAITED=$((WAITED + 1))
+            done
+
+            log "DNS name $SWIRL_FQDN resolved after $WAITED seconds."
+
+
+
+            TEMPLATE_FILE="$PARENT_DIR/nginx/nginx-template.tls"
+            UPDATE_MARKER="# swirl-service updated: USE_TLS=true, USE_CERT=false"
+
+            if ! grep -Fq "$UPDATE_MARKER" "$TEMPLATE_FILE"; then
+                log "Update Marker not found, adding TLS configuration to Nginx ${TEMPLATE_FILE}"
+                awk -v update_marker="$UPDATE_MARKER" '
+                {
+                    if (prev ~ /listen 443 ssl;/ && $0 ~ /server_name .*;/) {
+                        print
+                        print ""
+                        print "      " update_marker
+                        print "      ssl_certificate /etc/letsencrypt/live/${SWIRL_FQDN}/fullchain.pem;"
+                        print "      ssl_certificate_key /etc/letsencrypt/live/${SWIRL_FQDN}/privkey.pem;"
+                        print "      include /etc/letsencrypt/options-ssl-nginx.conf;"
+                        print "      ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;"
+                    } else {
+                        print
+                    }
+                    prev = $0
+                }
+                ' "$TEMPLATE_FILE" > tmp && mv tmp "$TEMPLATE_FILE"
+            fi
+            
+            OPTIONS_FILE="$PARENT_DIR/certbot/conf/options-ssl-nginx.conf"
+            DHPARAMS_FILE="$PARENT_DIR/certbot/conf/ssl-dhparams.pem"
+
+            TARGET_DIR="$PARENT_DIR/nginx/certificates/ssl"
+
+            mkdir -p $TARGET_DIR
+            cp "$OPTIONS_FILE" "$TARGET_DIR/"
+            cp "$DHPARAMS_FILE" "$TARGET_DIR/"
+            log "Copied TLS configs to $TARGET_DIR"
+
+            # when renewal not required
+            # we use existing certifiactes
+            certbot certonly --standalone --email $CERTBOT_EMAIL \
+              --agree-tos --no-eff-email -d "${SWIRL_FQDN}" \
+              --config-dir /certbot/conf \
+              --non-interactive --quiet
+
+            cp -a /certbot/conf/. $PARENT_DIR/certbot/conf
+
+            cp $PARENT_DIR/nginx/nginx-template.tls $PARENT_DIR/nginx/nginx.template
+            COMPOSE_PROFILES="$COMPOSE_PROFILES,certbot"
+
+        elif [ "$USE_CERT" == "true" ]; then
+            log "TLS enabled with owned certificate. Starting Nginx without Certbot."
+
+            CERT_PATH="$PARENT_DIR/nginx/certificates/ssl/${SWIRL_FQDN}"
+            if [ -f "$CERT_PATH/ssl_certificate.crt" ] && [ -f "$CERT_PATH/ssl_certificate_key.key" ]; then
+              log "Found owned certificate and key in '${CERT_PATH}'"
+                TEMPLATE_FILE="$PARENT_DIR/nginx/nginx-template.tls"
+
+                UPDATE_MARKER="# swirl-service updated: USE_TLS=true, USE_CERT=true"
+
+                # Check if the market is already present in the template
+                if ! grep -Fq "$UPDATE_MARKER" "$TEMPLATE_FILE"; then
+                    log "Update Marker not found, updating Nginx template with owned certificate paths."
+                    awk -v update_marker="$UPDATE_MARKER" '
+                    {
+                        if (prev ~ /listen 443 ssl;/ && $0 ~ /server_name .*;/) {
+                            print
+                            print ""
+                            print "      " update_marker
+                            print "      ssl_certificate /etc/nginx/ssl/${SWIRL_FQDN}/ssl_certificate.crt;"
+                            print "      ssl_certificate_key /etc/nginx/ssl/${SWIRL_FQDN}/ssl_certificate_key.key;"
+                        } else {
+                            print
+                        }
+                        prev = $0
+                    }
+                    ' "$TEMPLATE_FILE" > tmp && mv tmp "$TEMPLATE_FILE"
+                else
+                    log "Nginx template already contains the owned certificate paths."
+                fi
+            else
+                error "Certificate or key not found in '${CERT_PATH}'."
+            fi
+
+            cp $PARENT_DIR/nginx/nginx-template.tls $PARENT_DIR/nginx/nginx.template
+        fi
+    else
+        log "TLS is disabled. Starting Nginx without TLS."
+        cp $PARENT_DIR/nginx/nginx-template.notls $PARENT_DIR/nginx/nginx.template
+    fi
+else
+    log "USE_NGINX is false. Nginx will not be started."
+    cp $PARENT_DIR/nginx/nginx-template.notls $PARENT_DIR/nginx/nginx.template
+fi
+
+ONETIME_JOB_FLAG="$PARENT_DIR/.swirl-application-setup-job-complete.flag"
+if [ -f "$ONETIME_JOB_FLAG" ]; then
+    log "Application setup job already completed. Skipping initial setup."
+else
+    log "Setiing up run one-time application setup job..."
+    # Run the initial setup job
+    COMPOSE_PROFILES="$COMPOSE_PROFILES,setup"
+    touch "$ONETIME_JOB_FLAG"
 fi
 
 # Final startup
 log "Docker Compose Up with profiles: $COMPOSE_PROFILES"
-COMPOSE_PROFILES="$COMPOSE_PROFILES" docker compose up --pull never -d
+COMPOSE_PROFILES=$COMPOSE_PROFILES docker compose up --pull never
