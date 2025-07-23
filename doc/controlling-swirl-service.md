@@ -13,6 +13,30 @@ sudo systemctl start swirl
 sudo systemctl stop swirl
 sudo systemctl restart swirl
 ```
+### MacOS
+> Note: The service must be installed as a user-level LaunchAgent (e.g., in `~Library/LaunchAgents/com.swirl.service.plist`).
+
+**Start (manually):**
+```bash
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.swirl.service.plist
+```
+
+**Stop:**
+```bash
+launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.swirl.service.plist
+```
+
+**Restart:**
+```bash
+launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.swirl.service.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.swirl.service.plist
+```
+
+> Note: if `RunAtLoad` is set to `false`, the service won't run automatically when loaded. You'll need to explicitly start it using `kickstart`:
+```bash
+launchctl kickstart -k gui/$(id -u)/com.swirl.service
+```
+
 ### Docker
 ### Monitoring the Service
 To monitor the status of the Swirl service, you can use:
@@ -21,6 +45,17 @@ To monitor the status of the Swirl service, you can use:
 ```bash
 sudo systemctl status swirl
 sudo journalctl -u swirl
+```
+
+### MacOS
+To check if the service is running:
+```bash
+launchctl list | grep com.swirl.service
+```
+
+To monitor logs (if configured with `StandardOutPath` and `StandardErrorPath`):
+```bash
+tail -f $HOME/tmp/log/swirl-service.out $HOME/tmp/log/swirl-service.out
 ```
 
 ### Docker Monitoring
