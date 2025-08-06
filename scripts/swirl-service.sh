@@ -298,8 +298,9 @@ fi
 ONETIME_JOB_FLAG="$PARENT_DIR/.swirl-application-setup-job-complete.flag"
 if [ -f "$ONETIME_JOB_FLAG" ]; then
     log "Application setup job already completed. Skipping initial setup."
+    COMPOSE_PROFILES="$COMPOSE_PROFILES,reload"
 else
-    log "Setiing up run one-time application setup job..."
+    log "Setting up run one-time application setup job..."
     # Run the initial setup job
     COMPOSE_PROFILES="$COMPOSE_PROFILES,setup"
     touch "$ONETIME_JOB_FLAG"

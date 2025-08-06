@@ -111,7 +111,19 @@ services:
     env_file:
       - .env
     networks: ["swirl"]
-    command: ["python", "manage.py", "migrate"]
+    command: ["python", "swirl.py", "migrate", "-v"]
+
+  swirl-reload:
+    profiles: ["all", "reload"]
+    image: swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}
+    container_name: swirl_app_reload_prompts
+    env_file:
+      - .env
+    networks: ["swirl"]
+    command: ["python", "swirl.py", "reload_ai_prompts"]
+    depends_on:
+      swirl:
+        condition: service_healthy
 
   swirl:
     profiles: ["all", "svc", "swirl"]
