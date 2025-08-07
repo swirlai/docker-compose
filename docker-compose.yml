@@ -142,11 +142,10 @@ services:
     volumes:
       - ./nginx/nginx.template:/nginx/nginx.template
       - ./scripts/swirl-load.sh:/tmp/swirl-load.sh
-      - ./scripts/swirl-health-check.sh:/tmp/swirl-health-check.sh
       - ./uploads/:/app/uploads/
     networks: ["swirl"]
     healthcheck:
-      test: ["CMD-SHELL", "/tmp/swirl-health-check.sh || exit 1"]
+      test: ["CMD-SHELL", "/app/swirl-health-check.sh || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
