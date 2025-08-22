@@ -2,8 +2,11 @@
 
 
 # Stop Swirl
-systemctl stop swirl
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  systemctl stop swirl
+fi
 
+docker-compose --profile all down
 # Remove Swirl's Docker containers
 docker system prune --force
 
