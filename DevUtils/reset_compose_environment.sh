@@ -12,7 +12,7 @@ docker system prune --force
 
 # Remove Volumes
 docker volume prune --force
-docker volume rm app_db_data
+docker volume rm swirl_db_data
 
 # Verify that the volumes and containers are removed
 docker volume ls
