@@ -39,7 +39,7 @@ log "Parent directory: $PARENT_DIR"
 
 SERVICE_SETUP_FLAG="$PARENT_DIR/.swirl-service-setup-complete.flag"
 ENV_FILE="$PARENT_DIR/.env"
-EXAMPLE_ENV_FILE="$PARENT_DIR/.env.example"
+EXAMPLE_ENV_FILE="$PARENT_DIR/env.example"
 
 # Create .env file from example if not present
 if [ ! -f "$ENV_FILE" ]; then
