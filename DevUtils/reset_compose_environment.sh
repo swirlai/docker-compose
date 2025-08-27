@@ -2,14 +2,17 @@
 
 
 # Stop Swirl
-systemctl stop swirl
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  systemctl stop swirl
+fi
 
+docker-compose --profile all down
 # Remove Swirl's Docker containers
 docker system prune --force
 
 # Remove Volumes
 docker volume prune --force
-docker volume rm app_db_data
+docker volume rm swirl_db_data
 
 # Verify that the volumes and containers are removed
 docker volume ls

@@ -6,6 +6,10 @@ set -e
 # Disable X11 for GUI apps to avoid DBUS-related issues
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
+# Find full path to Docker binary
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export DOCKER_BIN="$(command -v docker)"
+
 # Logging function
 function log() {
     echo "[$(date +%Y-%m-%dT%H:%M:%S) ${STAGE}] $1"
@@ -16,10 +20,17 @@ function error() {
     echo "[$(date +%Y-%m-%dT%H:%M:%S) ${STAGE} ERROR] $1"
 }
 
-
 # Ensure log directory exists and redirect output to log file
-mkdir -p /var/log/swirl
-exec > >(tee -a /var/log/swirl/swirl.log) 2>&1
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    LOG_DIR="$HOME/Library/Logs/swirl"
+    log "Creating base log directory for MacOS: $LOG_DIR"
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    LOG_DIR="/var/log/swirl"
+    log "Creating base log directory for Linux: $LOG_DIR"
+fi
+mkdir -p "$LOG_DIR"
+log "Log directory successfully created."
+exec > >(tee -a "$LOG_DIR/swirl.log") 2>&1  
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 log "Script directory: $SCRIPT_DIR"
@@ -28,7 +39,7 @@ log "Parent directory: $PARENT_DIR"
 
 SERVICE_SETUP_FLAG="$PARENT_DIR/.swirl-service-setup-complete.flag"
 ENV_FILE="$PARENT_DIR/.env"
-EXAMPLE_ENV_FILE="$PARENT_DIR/.env.example"
+EXAMPLE_ENV_FILE="$PARENT_DIR/env.example"
 
 # Create .env file from example if not present
 if [ ! -f "$ENV_FILE" ]; then
@@ -83,17 +94,46 @@ else
     fi
 
     # check for local images
-    if docker inspect "swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}" > /dev/null 2>&1; then
+    if "${DOCKER_BIN}" inspect "swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}" > /dev/null 2>&1; then
         log "Setup: Found local Swirl image swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}"
     else
         log "Setup: Local Swirl image swirlai/release-swirl-search-enterprise:${SWIRL_VERSION} not found. Pulling images from Docker Hub."
-        docker compose --profile all pull --quiet
+        "${DOCKER_BIN}" compose -f $PARENT_DIR/docker-compose.yml --profile all pull --quiet
     fi
 
-    log "Setup:  Setup starting"
+    log "Setup: Setup starting..."
     log "Setup: Enabling Swirl service to start on boot..."
 
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        log "Setup: Running on macOS (user-level LaunchAgent)."
+
+        SERVICE_FILE="$SCRIPT_DIR/com.swirl.service.plist"
+        REPLACEMENT="$SCRIPT_DIR/swirl-service.sh"
+
+        log "Setup: Patching service .plist file to use $REPLACEMENT..."
+        sed -i '' "s|{{SWIRL_SCRIPT_PATH}}|$REPLACEMENT|g" "$SERVICE_FILE"
+        sed -i '' "s|{{HOME_LOG_PATH}}|$HOME|g" "$SERVICE_FILE"
+        log "Setup: Service .plist file successfully patched"
+
+        log "Setup: Copying service .plist file to ~/Library/LaunchAgents/"
+        cp "$SERVICE_FILE" ~/Library/LaunchAgents/com.swirl.service.plist
+        log "Service .plist file successfully copied to ~/Library/LaunchAgents/com.swirl.service.plist"
+
+        # Verifies if the current shell is a valid GUI session
+        if launchctl print "gui/$(id -u)" &>/dev/null; then
+            log "Setup: Session supports user-level LaunchAgent. Bootstrapping..."
+
+            launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.swirl.service.plist 2>/dev/null || true
+            launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.swirl.service.plist
+            launchctl enable gui/$(id -u)/com.swirl.service
+
+            log "Setup: LaunchAgent bootstrapped successfully."
+            log "To start Swirl manually, run the following command in a terminal: 'launchctl kickstart -k gui/\$(id -u)/com.swirl.service'"
+        else
+            log "WARNING: Current shell is not a GUI session."
+            log "You must manually run the following command in a terminal: 'launchctl bootstrap gui/\$(id -u) ~/Library/LaunchAgents/com.swirl.service.plist'"
+        fi
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
         log "Setup: Running on Linux."
 
         if [ ! -f "/etc/systemd/system/swirl.service" ]; then
@@ -114,7 +154,7 @@ else
         fi
         systemctl enable swirl
 
-        log "Start Service via: systemctl start swirl "
+        log "Start Service via: systemctl start swirl"
         log "Monitor Service via: journalctl -u swirl"
 
     else
@@ -129,15 +169,14 @@ fi
 # Base profile for Swirl services
 COMPOSE_PROFILES=svc
 
-
 # Stop previously running Swirl containers
 log "Stopping any Swirl containers from previous run"
-docker compose --profile all stop
+"${DOCKER_BIN}" compose -f $PARENT_DIR/docker-compose.yml --profile all stop
 
 # Conditionally add local Postgres
 if [ "$USE_LOCAL_POSTGRES" == "true" ]; then
     log "Local Postgres is enabled. Starting service."
-    (COMPOSE_PROFILES=db docker compose up --pull never -d)
+    (COMPOSE_PROFILES=db "${DOCKER_BIN}" compose -f $PARENT_DIR/docker-compose.yml up --pull never -d)
     log "Started local Postgres service."
     sleep 15
 fi
@@ -165,8 +204,6 @@ if [ "$USE_NGINX" == "true" ]; then
             done
 
             log "DNS name $SWIRL_FQDN resolved after $WAITED seconds."
-
-
 
             TEMPLATE_FILE="$PARENT_DIR/nginx/nginx-template.tls"
             UPDATE_MARKER="# swirl-service updated: USE_TLS=true, USE_CERT=false"
@@ -261,8 +298,9 @@ fi
 ONETIME_JOB_FLAG="$PARENT_DIR/.swirl-application-setup-job-complete.flag"
 if [ -f "$ONETIME_JOB_FLAG" ]; then
     log "Application setup job already completed. Skipping initial setup."
+    COMPOSE_PROFILES="$COMPOSE_PROFILES,reload"
 else
-    log "Setiing up run one-time application setup job..."
+    log "Setting up run one-time application setup job..."
     # Run the initial setup job
     COMPOSE_PROFILES="$COMPOSE_PROFILES,setup"
     touch "$ONETIME_JOB_FLAG"
@@ -270,4 +308,4 @@ fi
 
 # Final startup
 log "Docker Compose Up with profiles: $COMPOSE_PROFILES"
-COMPOSE_PROFILES=$COMPOSE_PROFILES docker compose up --pull never
+COMPOSE_PROFILES=$COMPOSE_PROFILES "${DOCKER_BIN}" compose -f $PARENT_DIR/docker-compose.yml up --pull never

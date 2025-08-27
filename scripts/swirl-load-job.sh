@@ -59,3 +59,5 @@ fi
 
 # Load Swirl's initial data
 python swirl.py load_data
+python swirl.py reload_ai_prompts
+python swirl.py load_branding

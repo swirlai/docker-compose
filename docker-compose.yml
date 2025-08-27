@@ -111,7 +111,19 @@ services:
     env_file:
       - .env
     networks: ["swirl"]
-    command: ["python", "manage.py", "migrate"]
+    command: ["python", "swirl.py", "migrate", "-v"]
+
+  swirl-reload:
+    profiles: ["all", "reload"]
+    image: swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}
+    container_name: swirl_app_reload_prompts
+    env_file:
+      - .env
+    networks: ["swirl"]
+    command: ["python", "swirl.py", "reload_ai_prompts"]
+    depends_on:
+      swirl:
+        condition: service_healthy
 
   swirl:
     profiles: ["all", "svc", "swirl"]
@@ -130,11 +142,10 @@ services:
     volumes:
       - ./nginx/nginx.template:/nginx/nginx.template
       - ./scripts/swirl-load.sh:/tmp/swirl-load.sh
-      - ./scripts/swirl-health-check.sh:/tmp/swirl-health-check.sh
       - ./uploads/:/app/uploads/
     networks: ["swirl"]
     healthcheck:
-      test: ["CMD-SHELL", "/tmp/swirl-health-check.sh || exit 1"]
+      test: ["CMD-SHELL", "/app/swirl-health-check.sh || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
