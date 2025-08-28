@@ -49,7 +49,10 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
     - Start, stop, and restart the Swirl service.
     - View logs and status of the service.
     - Manage service configuration.
-    
+
+# Downloads
+- [Swirl Enterprise Edition Docker Environment 4.3.0 tar file](https://github.com/swirlai/docker-compose/archive/refs/tags/v4_3_0_0.tar.gz)
+
 # Additional Documentation
 
 [Overview](https://docs.swirlaiconnect.com/) | [Quick Start](https://docs.swirlaiconnect.com/Quick-Start) | [User Guide](https://docs.swirlaiconnect.com/User-Guide) | [Admin Guide](https://docs.swirlaiconnect.com/Admin-Guide) | [M365 Guide](https://docs.swirlaiconnect.com/M365-Guide) | [Developer Guide](https://docs.swirlaiconnect.com/Developer-Guide) | [Developer Reference](https://docs.swirlaiconnect.com/Developer-Reference) | [AI Search Guide](https://docs.swirlaiconnect.com/AI-Search.html) | [AI Search Assistant Guide](https://docs.swirlaiconnect.com/AI-Search-Assistant.html)
