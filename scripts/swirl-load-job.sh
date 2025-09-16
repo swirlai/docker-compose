@@ -14,6 +14,8 @@ function update_json() {
 # Create a Django superuser using environment variables for email and password
 DJANGO_SUPERUSER_PASSWORD=$ADMIN_PASSWORD python manage.py createsuperuser --email $ADMIN_USER_EMAIL --username admin --noinput;
 
+
+
 # Check if MSAL configuration is present
 if [ -n "$MSAL_AUTH_REDIRECT_URI" ]; then
   echo "MSAL configuration detected, M365 Search Providers will be enabled"
@@ -61,3 +63,9 @@ fi
 python swirl.py load_data
 python swirl.py reload_ai_prompts
 python swirl.py load_branding
+
+# Optionally Swirl API User if environment variables are set
+if [ -n "$SWIRL_API_USERNAME" ] && [ -n "$SWIRL_API_PASSWORD" ]; then
+  echo "MCP Support: Creating Swirl API user: $SWIRL_API_USERNAME"
+  python manage.py shell -c "from django.contrib.auth.models import User, Group; user=User.objects.create_user(username='${SWIRL_API_USERNAME}', password='${SWIRL_API_PASSWORD}'); group, _ = Group.objects.get_or_create(name='swirl_auto_provisioned_group'); user.groups.add(group)"
+fi
