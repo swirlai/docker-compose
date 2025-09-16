@@ -295,7 +295,6 @@ else
     cp $PARENT_DIR/nginx/nginx-template.notls $PARENT_DIR/nginx/nginx.template
 fi
 
-
 if [ "$MCP_ENABLED" == "true" ]; then
   COMPOSE_PROFILES="$COMPOSE_PROFILES,mcp"
 fi

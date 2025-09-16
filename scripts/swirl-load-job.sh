@@ -14,8 +14,6 @@ function update_json() {
 # Create a Django superuser using environment variables for email and password
 DJANGO_SUPERUSER_PASSWORD=$ADMIN_PASSWORD python manage.py createsuperuser --email $ADMIN_USER_EMAIL --username admin --noinput;
 
-
-
 # Check if MSAL configuration is present
 if [ -n "$MSAL_AUTH_REDIRECT_URI" ]; then
   echo "MSAL configuration detected, M365 Search Providers will be enabled"

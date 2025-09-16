@@ -79,7 +79,7 @@ services:
 
   mcp:
     profiles: [ "all", "svc", "mcp" ]
-    image: swirlai/dev-mcp-proxy-enterprise:${MCP_VERSION}
+    image: swirlai/release-mcp-proxy-enterprise:${MCP_VERSION}
     container_name: swirl_mcp
     networks: [ "swirl" ]
     ports:
@@ -126,7 +126,6 @@ services:
     command: ["/bin/bash","/tmp/swirl-load-job.sh"]
     volumes:
       - ./scripts/swirl-load-job.sh:/tmp/swirl-load-job.sh
-      - ./scripts/create-user.py:/tmp/create-user.py
     networks: ["swirl"]
     depends_on:
       swirl:
