@@ -3,6 +3,27 @@ set -e  # Exit the script immediately if any command fails
 
 echo "Setting up swirl"
 
+# auto populating Variables
+export PROTOCOL=${PROTOCOL:-http}
+if [ -z "$PORT" ]; then
+  export CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS:-$PROTOCOL://$SWIRL_FQDN}
+else
+  export CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS:-$PROTOCOL://$SWIRL_FQDN:$PORT}
+fi
+
+# if $SWIRL_FQDN is not in ALLOWED_HOSTS, add it
+if [[ -z "$ALLOWED_HOSTS" ]]; then
+  export ALLOWED_HOSTS=localhost,$SWIRL_FQDN
+elif [[ ! "$ALLOWED_HOSTS" =~ (^|,)$SWIRL_FQDN(,|$) ]]; then
+  export ALLOWED_HOSTS=$ALLOWED_HOSTS,$SWIRL_FQDN
+fi
+
+echo "SWIRL_FQDN is set to: $SWIRL_FQDN"
+echo "ALLOWED_HOSTS is set to: $ALLOWED_HOSTS"
+echo "CSRF_TRUSTED_ORIGINS is set to: $CSRF_TRUST_CSRF_TRUSTED_ORIGINS"
+
+
+
 # Remove any existing swirl configuration directory
 rm -rf .swirl
 

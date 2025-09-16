@@ -85,11 +85,15 @@ services:
     ports:
       - "${MCP_PORT}:${MCP_PORT}"      # expose the MCP port
     environment:
-      SWIRL_MCP_SERVER_HOST: "0.0.0.0"
-      SWIRL_MCP_SERVER_PORT: "${MCP_PORT}"
       SWIRL_API_BASE: "${MCP_SWIRL_BASE_URL}"
       SWIRL_API_BASE_PATH: "${MCP_SWIRL_BASE_PATH}"
+      SWIRL_API_PASSWORD: "${SWIRL_API_PASSWORD}"
+      SWIRL_API_USERNAME: "${SWIRL_API_USERNAME}"
+      SWIRL_MCP_SERVER_HOST: "0.0.0.0"
+      SWIRL_MCP_SERVER_PORT: "${MCP_PORT}"
       SWIRL_MCP_SWIRL_API_TIMEOUT: "${MCP_TIMEOUT}"
+      SWIRL_MCP_PASSWORD: "${SWIRL_MCP_PASSWORD}"
+      SWIRL_MCP_USERNAME: "${SWIRL_MCP_USERNAME}"
     healthcheck:
       test: [ "CMD-SHELL", "/app/scripts/check-mcp-health.sh || exit 1" ]
       interval: 30s
