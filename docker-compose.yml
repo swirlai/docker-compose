@@ -77,6 +77,33 @@ services:
       timeout: 5s
       retries: 5
 
+  mcp:
+    profiles: [ "all", "svc", "mcp" ]
+    image: swirlai/release-mcp-proxy-enterprise:${MCP_VERSION}
+    container_name: swirl_mcp
+    networks: [ "swirl" ]
+    ports:
+      - "${MCP_PORT}:${MCP_PORT}"      # expose the MCP port
+    environment:
+      SWIRL_API_BASE: "${MCP_SWIRL_BASE_URL}"
+      SWIRL_API_BASE_PATH: "${MCP_SWIRL_BASE_PATH}"
+      SWIRL_API_PASSWORD: "${SWIRL_API_PASSWORD}"
+      SWIRL_API_USERNAME: "${SWIRL_API_USERNAME}"
+      SWIRL_MCP_SERVER_HOST: "0.0.0.0"
+      SWIRL_MCP_SERVER_PORT: "${MCP_PORT}"
+      SWIRL_MCP_SWIRL_API_TIMEOUT: "${MCP_TIMEOUT}"
+      SWIRL_MCP_PASSWORD: "${SWIRL_MCP_PASSWORD}"
+      SWIRL_MCP_USERNAME: "${SWIRL_MCP_USERNAME}"
+    healthcheck:
+      test: [ "CMD-SHELL", "/app/scripts/check-mcp-health.sh || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      swirl:
+        condition: service_healthy
+
   tika:
     profiles: ["all", "svc", "tika"]
     image: swirlai/release-tika-enterprise:${TIKA_VERSION}
@@ -112,18 +139,6 @@ services:
       - .env
     networks: ["swirl"]
     command: ["python", "swirl.py", "migrate", "-v"]
-
-  swirl-reload:
-    profiles: ["all", "reload"]
-    image: swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}
-    container_name: swirl_app_reload_prompts
-    env_file:
-      - .env
-    networks: ["swirl"]
-    command: ["python", "swirl.py", "reload_ai_prompts"]
-    depends_on:
-      swirl:
-        condition: service_healthy
 
   swirl:
     profiles: ["all", "svc", "swirl"]
