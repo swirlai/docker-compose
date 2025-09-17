@@ -43,7 +43,7 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
     - [PostgreSQL](doc/service-setup.md#postgresql)
 - [Connecting Swirl to the Enterprise](doc/service-setup.md#connecting-swirl-to-the-enterprise)
     - [Connecting to Microsoft IDP](doc/service-setup.md#connecting-to-microsoft-idp)
-
+- [Configuring MCP Proxy (optional)](doc/mcp-proxy-setup.md)
 ## Controlling and Monitoring Swirl Service
 - [Controlling Swirl Service](doc/controlling-swirl-service.md)
     - Start, stop, and restart the Swirl service.
@@ -52,6 +52,7 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 
 # Downloads
 - [Swirl Enterprise Edition Docker Environment 4.3.0 tar file](https://github.com/swirlai/docker-compose/archive/refs/tags/v4_3_0_0.tar.gz)
+- [Swirl Enterprise Edition Docker Environment 4.3.0 with MCP 1.0.5 tar file](https://github.com/swirlai/docker-compose/archive/refs/tags/v4_3_0_0_mcp_v1_0_5.tar.gz)
 
 # Additional Documentation
 
