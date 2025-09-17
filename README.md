@@ -43,7 +43,7 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
     - [PostgreSQL](doc/service-setup.md#postgresql)
 - [Connecting Swirl to the Enterprise](doc/service-setup.md#connecting-swirl-to-the-enterprise)
     - [Connecting to Microsoft IDP](doc/service-setup.md#connecting-to-microsoft-idp)
-
+- [Configuring MCP Proxy (optional)](doc/mcp-proxy-setup.md)
 ## Controlling and Monitoring Swirl Service
 - [Controlling Swirl Service](doc/controlling-swirl-service.md)
     - Start, stop, and restart the Swirl service.
