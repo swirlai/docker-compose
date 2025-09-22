@@ -54,4 +54,4 @@ sleep 30
 
 # Start background workers and the Daphne web server
 echo "Starting swirl"
-python swirl.py start celery-worker celery-healthcheck-worker celery-beats && daphne -b 0.0.0.0 -p 8000 swirl_server.asgi:application;
+python swirl.py start celery-worker celery-healthcheck-worker celery-beats && daphne -b 0.0.0.0 -p ${SWIRL_PORT:-8000} swirl_server.asgi:application;
