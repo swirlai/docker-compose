@@ -66,10 +66,10 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
+  redis-broker:
     profiles: ["all", "svc", "redis"]
     image: redis:${REDIS_VERSION:-7}
-    container_name: swirl_redis
+    container_name: swirl_redis_broker
     networks: ["swirl"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -77,6 +77,16 @@ services:
       timeout: 5s
       retries: 5
 
+  redis-cache:
+    profiles: ["all", "svc", "redis"]
+    image: redis:${REDIS_VERSION:-7}
+    container_name: swirl_redis_cache
+    networks: ["swirl"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   mcp:
     profiles: [ "all", "svc", "mcp" ]
     image: swirlai/release-mcp-proxy-enterprise:${MCP_VERSION}
@@ -149,8 +159,11 @@ services:
     ports:
       - "${SWIRL_PORT:-8000}:${SWIRL_PORT:-8000}"
     depends_on:
-      redis:
+      redis-broker:
         condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+
       swirl-init:
         condition: service_completed_successfully
     command: ["/bin/bash","/tmp/swirl-load.sh"]
