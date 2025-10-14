@@ -88,7 +88,7 @@ services:
       timeout: 5s
       retries: 5
   mcp:
-    profiles: [ "all", "svc", "mcp" ]
+    profiles: [ "all", "mcp" ]
     image: swirlai/release-mcp-proxy-enterprise:${MCP_VERSION}
     container_name: swirl_mcp
     networks: [ "swirl" ]

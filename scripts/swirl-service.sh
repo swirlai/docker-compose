@@ -20,6 +20,39 @@ function error() {
     echo "[$(date +%Y-%m-%dT%H:%M:%S) ${STAGE} ERROR] $1"
 }
 
+# Function to determine active Docker Compose profiles based on environment variables
+function get_active_profiles() {
+    local profiles="svc"
+
+    if [ "$USE_LOCAL_POSTGRES" == "true" ]; then
+        profiles="$profiles,db"
+    fi
+
+    # Add Nginx profile if enabled
+    if [ "$USE_NGINX" == "true" ]; then
+        profiles="$profiles,nginx"
+
+        # Add Certbot profile if using TLS without owned certificate
+        if [ "$USE_TLS" == "true" ] && [ "$USE_CERT" == "false" ]; then
+            profiles="$profiles,certbot"
+        fi
+    fi
+
+    # Add MCP profile if enabled
+    if [ "$MCP_ENABLED" == "true" ]; then
+        profiles="$profiles,mcp"
+    fi
+
+    # Add setup profile if one-time job hasn't been completed
+    local ONETIME_JOB_FLAG="$PARENT_DIR/.swirl-application-setup-job-complete.flag"
+    if [ ! -f "$ONETIME_JOB_FLAG" ]; then
+        profiles="$profiles,setup"
+    fi
+
+    echo "$profiles"
+}
+
+
 # Ensure log directory exists and redirect output to log file
 if [[ "$OSTYPE" == "darwin"* ]]; then
     LOG_DIR="$HOME/Library/Logs/swirl"
@@ -98,7 +131,7 @@ else
         log "Setup: Found local Swirl image swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}"
     else
         log "Setup: Local Swirl image swirlai/release-swirl-search-enterprise:${SWIRL_VERSION} not found. Pulling images from Docker Hub."
-        "${DOCKER_BIN}" compose -f $PARENT_DIR/docker-compose.yml --profile all pull --quiet
+        "${DOCKER_BIN}" compose -f $PARENT_DIR/docker-compose.yml --profile $(get_active_profiles) pull --quiet
     fi
 
     log "Setup: Setup starting..."
@@ -166,8 +199,6 @@ else
     exit 0
 fi
 
-# Base profile for Swirl services
-COMPOSE_PROFILES=svc
 
 # Stop previously running Swirl containers
 log "Stopping any Swirl containers from previous run"
@@ -183,9 +214,6 @@ fi
 
 # Conditionally add Nginx and Certbot
 if [ "$USE_NGINX" == "true" ]; then
-    log "Enabling Nginx profile."
-    COMPOSE_PROFILES="$COMPOSE_PROFILES,nginx"
-
     if [ "$USE_TLS" == "true" ]; then
         if [ "$USE_CERT" == "false" ]; then
             log "TLS enabled with Certbot. Starting Nginx and Certbot."
@@ -248,7 +276,6 @@ if [ "$USE_NGINX" == "true" ]; then
             cp -a /certbot/conf/. $PARENT_DIR/certbot/conf
 
             cp $PARENT_DIR/nginx/nginx-template.tls $PARENT_DIR/nginx/nginx.template
-            COMPOSE_PROFILES="$COMPOSE_PROFILES,certbot"
 
         elif [ "$USE_CERT" == "true" ]; then
             log "TLS enabled with owned certificate. Starting Nginx without Certbot."
@@ -295,10 +322,7 @@ else
     cp $PARENT_DIR/nginx/nginx-template.notls $PARENT_DIR/nginx/nginx.template
 fi
 
-if [ "$MCP_ENABLED" == "true" ]; then
-  COMPOSE_PROFILES="$COMPOSE_PROFILES,mcp"
-fi
-
+COMPOSE_PROFILES=$(get_active_profiles)
 ONETIME_JOB_FLAG="$PARENT_DIR/.swirl-application-setup-job-complete.flag"
 if [ ! -f "$ONETIME_JOB_FLAG" ]; then
     log "Setting up run one-time application setup job..."
