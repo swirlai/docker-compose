@@ -210,14 +210,14 @@ if [ "$USE_NGINX" == "true" ]; then
 
             if ! grep -Fq "$UPDATE_MARKER" "$TEMPLATE_FILE"; then
                 log "Update Marker not found, adding TLS configuration to Nginx ${TEMPLATE_FILE}"
-                awk -v update_marker="$UPDATE_MARKER" '
+                awk -v update_marker="$UPDATE_MARKER" -v fqdn="$SWIRL_FQDN" '
                 {
                     if (prev ~ /listen 443 ssl;/ && $0 ~ /server_name .*;/) {
                         print
                         print ""
                         print "      " update_marker
-                        print "      ssl_certificate /etc/letsencrypt/live/${SWIRL_FQDN}/fullchain.pem;"
-                        print "      ssl_certificate_key /etc/letsencrypt/live/${SWIRL_FQDN}/privkey.pem;"
+                        print "      ssl_certificate /etc/letsencrypt/live/" fqdn "/fullchain.pem;"
+                        print "      ssl_certificate_key /etc/letsencrypt/live/" fqdn "/privkey.pem;"
                         print "      include /etc/letsencrypt/options-ssl-nginx.conf;"
                         print "      ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;"
                     } else {
