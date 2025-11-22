@@ -240,6 +240,11 @@ if [ "$USE_NGINX" == "true" ]; then
 
             # when renewal not required
             # we use existing certifiactes
+            echo "DNDEBUG : " certbot certonly --standalone --email $CERTBOT_EMAIL \
+              --agree-tos --no-eff-email -d "${SWIRL_FQDN}" \
+              --config-dir /certbot/conf \
+              --non-interactive --quiet
+
             certbot certonly --standalone --email $CERTBOT_EMAIL \
               --agree-tos --no-eff-email -d "${SWIRL_FQDN}" \
               --config-dir /certbot/conf \
