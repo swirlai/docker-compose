@@ -134,6 +134,28 @@ Stop Swirl using:
 ./scripts/stop-swirl.sh
 ```
 
+### 7. Configure ODIC with Microsoft as th IDP
+1. Create an App Registration according to instructions here (Erik?)
+2. Edit the `.env` file entries to included the cleint ID and tenant :
+```sh
+# Uncomment and set the following if you want to use Microsoft authentication
+MS_AUTH_CLIENT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+MS_TENANT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+```
+3. In addition, make sure that ```PROTOCOL``` and ```SWIRL_PORT``` are set to match your front page URL,some examples:
+If you're accessing Swirl on your local machine:
+```sh
+PROTOCOL="http"
+SWIRL_PORT="8000"
+```
+
+If you're accessing Swirl through https and standard ports:
+```sh
+## If your running Swirl on your local machine:
+PROTOCOL="https"
+SWIRL_PORT=""
+```
+
 ---
 
 Swirl should now be running and accessible at your configured domain.
