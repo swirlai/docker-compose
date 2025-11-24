@@ -15,7 +15,7 @@ Go to:
 
 ```
 
-[https://hub.docker.com/](https://hub.docker.com/)
+[Docker Hub](https://hub.docker.com/)
 
 ```
 
@@ -35,7 +35,7 @@ Or go directly to:
 
 ```
 
-[https://hub.docker.com/settings/security](https://hub.docker.com/settings/security)
+[Security](https://hub.docker.com/settings/security)
 
 ```
 
@@ -95,7 +95,6 @@ Docker Hub will now show the token **once only**.
 Store the token in a secure location:
 
 - a secrets manager
-- `.env` file (not committed)
 - CI/CD secret store
 - Docker credential helper
 
@@ -109,6 +108,11 @@ Run:
 
 ```sh
 echo "<YOUR_PAT>" | docker login -u <your-docker-username> --password-stdin
+````
+
+or use the Swirl script
+```sh
+./scripts/docker_loginsh
 ````
 
 If successful, you will see:
