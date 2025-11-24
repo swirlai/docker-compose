@@ -7,12 +7,6 @@ This document explains how to configure and deploy Swirl by providing:
 
 ---
 
-## Setup Instructions for the Swirl Docker Compose Deployment
-
-Follow the steps below to install and run Swirl using Docker Compose.
-
----
-
 ### 1. Allocate a Host Machine
 You may deploy Swirl on:
 
