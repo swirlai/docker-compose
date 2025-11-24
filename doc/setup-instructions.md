@@ -148,6 +148,8 @@ Any value marked **CHANGE_ME** must be customized.
 
 ## 🟦 General Settings
 
+Int the env.example file you will see the phrase CHANGE_ME next to several settings. These are settings you should consider changing to customize your deployment.
+
 | Name | Default Value | Comment |
 |------|---------------|---------|
 | CERTBOT_EMAIL | admin@swirl.today | CHANGE_ME – Email used for Certbot certificate registration |
@@ -158,9 +160,9 @@ Any value marked **CHANGE_ME** must be customized.
 | SWIRL_VERSION | v4_3_0_0 | Swirl release version |
 | TIKA_VERSION | v4_3_0_0 | Apache Tika server version |
 | TTM_VERSION | v4_3_0_0 | Topic Text Matcher version |
-| USE_CERT | false | CHANGE_ME – Enable Certbot-managed TLS |
-| USE_LOCAL_POSTGRES | true | CHANGE_ME – Use local Postgres container |
-| USE_NGINX | false | CHANGE_ME – Enable Nginx reverse proxy |
+| USE_CERT | false | CHANGE_ME – Enable Bring your own Cert TLS |
+| USE_LOCAL_POSTGRES | true | CHANGE_ME – Use local Postgres container,or an external Postgres instance |
+| USE_NGINX | false | CHANGE_ME – Enable Nginx reverse proxy, almost always set to true if USE_TLS is true|
 | USE_TLS | false | CHANGE_ME – Enable TLS for Swirl |
 
 ---
@@ -170,13 +172,13 @@ Any value marked **CHANGE_ME** must be customized.
 | Name | Default Value | Comment |
 |------|---------------|---------|
 | ADMIN_USER_EMAIL | "admin@swirl.today" | CHANGE_ME – Django admin email |
-| ALLOWED_HOSTS | "localhost,127.0.0.1,swirl," | CHANGE_ME – Comma-separated host list |
+| ALLOWED_HOSTS | "localhost,127.0.0.1,swirl," | CHANGE_ME – Comma-separated host list, add your FDQN if you've created a DNS entry for it   |
 | AXES_CLIENT_IP_CALLABLE | "" | Optional: Django-Axes IP resolver |
-| AZ_GOV_COMPATIBLE | false | CHANGE_ME – Azure GovCloud compatibility |
+| AZ_GOV_COMPATIBLE | false | CHANGE_ME – Azure GovCloud compatibility, only set if you're deploying unde Azrue Gov restrictions |
 | CACHE_REDIS_URL | redis://redis:6379/1 | Cache backend |
 | CELERY_BROKER_URL | redis://redis:6379/0 | Celery broker |
 | CELERY_RESULT_BACKEND | redis://redis:6379/0 | Celery result backend |
-| CSRF_TRUSTED_ORIGINS | "http://localhost:8000" | CHANGE_ME – Allowed origins for CSRF |
+| CSRF_TRUSTED_ORIGINS | "http://localhost:8000" | CHANGE_ME – Allowed origins for CSRF, add your FDQN if you've created a DNS entry for it  |
 | GOOGLE_APPLICATION_CREDENTIALS | /app/secrets/google-credentials.json | Path to Google JSON key |
 | IN_PRODUCTION | "False" | Production mode toggle |
 | LOGIN_REDIRECT_URL | "" | Post-login redirect |
@@ -187,16 +189,16 @@ Any value marked **CHANGE_ME** must be customized.
 | SEARCH_RESULT_STORE_REDIS_URL | redis://redis:6379/2 | Redis store for search results |
 | SEARCH_RESULTS_STORE_TIMEOUT | 300 | Seconds before search results expire |
 | SHOULD_USE_TOKEN_FROM_OAUTH | True | Use OAuth token forwarded by client |
-| SQL_DATABASE | swirl | Database name |
-| SQL_ENGINE | django.db.backends.postgresql | PostgreSQL engine |
-| SQL_HOST | postgres | CHANGE_ME – Database hostname |
-| SQL_PORT | 5432 | CHANGE_ME – Database port |
-| SQL_SSLMODE | prefer | CHANGE_ME – SSL mode (prefer/require/disable) |
+| SQL_DATABASE | swirl | Database name,, default is set to be compatible with USE_LOCAL_POSTGRES set to true |
+| SQL_ENGINE | django.db.backends.postgresql | PostgreSQL engine, default is set to be compatible with USE_LOCAL_POSTGRES set to true |
+| SQL_HOST | postgres | CHANGE_ME – Database hostname, default is set to be compatible with USE_LOCAL_POSTGRES set to true |
+| SQL_PORT | 5432 | CHANGE_ME – Database port,, default is set to be compatible with USE_LOCAL_POSTGRES set to true |
+| SQL_SSLMODE | prefer | CHANGE_ME – SSL mode (prefer/require/disable), default is set to be compatible with USE_LOCAL_POSTGRES set to true |
 | SWIRL_ES_VERSION | 8 | Elasticsearch compatibility |
 | SWIRL_EXPLAIN | True | Enable explain output |
-| SWIRL_FQDN | localhost | CHANGE_ME – Public hostname |
+| SWIRL_FQDN | localhost | CHANGE_ME – Public hostname, set to your FDQN if you've created a DNS entry for it|
 | SWIRL_LOG_DEBUG | "" | Enable debug logging |
-| SWIRL_LICENSE | "" | CHANGE_ME – Enterprise license key |
+| SWIRL_LICENSE | '' | CHANGE_ME – Enterprise license key, acquire this from Swirl, make sure to add it between the single quotes |
 | SWIRL_PORT | "" | CHANGE_ME – Must be 8000 for OIDC local use |
 | SWIRL_RAG_CHAT_INTERACTION_APPROACH | ChatGAIGuided | RAG conversation approach |
 | SWIRL_RAG_DISTRIBUTION_STRATEGY | RoundRobin | RAG distribution strategy |
@@ -210,8 +212,8 @@ Any value marked **CHANGE_ME** must be customized.
 
 | Name | Default Value | Comment |
 |------|---------------|---------|
-| MICROSOFT_CLIENT_ID | "" | Microsoft OAuth client ID |
-| MICROSOFT_CLIENT_SECRET | "" | Microsoft OAuth client secret |
+| MICROSOFT_CLIENT_ID | "" | Microsoft OAuth client ID, set if you plan to use OIDC with Microsoft as the IDP |
+| MICROSOFT_CLIENT_SECRET | "" | Microsoft OAuth client secret, set if you plan to use OIDC with Microsoft as the IDP |
 | MICROSOFT_REDIRECT_URI | "" | Microsoft OAuth redirect |
 | OIDC_AUTHENTICATION_CALLBACK_URL | "" | OIDC callback URL |
 | OIDC_OP_AUTHORIZATION_ENDPOINT | "" | Authorization endpoint |
