@@ -15,18 +15,7 @@ You may deploy Swirl on:
 
 ---
 
-### 2. Prepare the Host
-
-#### **On Linux**
-Run the setup script:
-
-```sh
-sudo setup/ubuntu24_04.sh
-````
-
----
-
-### 3. Clone the Repository
+### 2. Clone the Repository
 
 Clone the docker-compose repository for the version you want to deploy.
 Example:
@@ -35,6 +24,17 @@ Example:
 git clone -b v4_3_0_0 https://github.com/swirlai/docker-compose swirl-enterprise-compose
 cd swirl-enterprise-compose
 ```
+
+---
+
+### 3. Prepare the Host
+
+#### **On Linux**
+Run the setup script:
+
+```sh
+sudo setup/ubuntu24_04.sh
+````
 
 ---
 
