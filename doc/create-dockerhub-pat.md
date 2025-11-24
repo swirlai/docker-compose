@@ -2,11 +2,9 @@
 
 Go to:
 
-```
 
 [Docker Hub](https://hub.docker.com/)
 
-```
 
 Sign in with your Docker Hub account.
 
@@ -22,11 +20,9 @@ Then select:
 
 Or go directly to:
 
-```
 
 [Security](https://hub.docker.com/settings/security)
 
-```
 
 ---
 
@@ -34,11 +30,8 @@ Or go directly to:
 
 Click:
 
-```
+***New Access Token***
 
-New Access Token
-
-```
 
 ---
 
@@ -46,11 +39,9 @@ New Access Token
 
 Provide a descriptive name, such as:
 
-```
 
-Swirl Docker Pull Token
+***Swirl Docker Pull Token***
 
-```
 
 ---
 
@@ -69,11 +60,9 @@ This is the safest setting for automated deployments.
 
 Click:
 
-```
 
-Generate
+***Generate***
 
-````
 
 Docker Hub will now show the token **once only**.
 
