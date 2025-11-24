@@ -3,21 +3,10 @@
 This document explains how to configure and deploy Swirl by providing:
 
 - A **Setup Instructions** section to guide you through preparing your environment
-- A **complete table of all Swirl configuration settings**, including defaults and notes
-  (all values marked `CHANGE_ME` require customization)
+- A **complete table of all Swirl configuration settings**, including defaults and notes (all values marked `CHANGE_ME` should be reviewed and may require customization)
 
 ---
 
-## 1. Setup Instructions
-
-Follow these steps to prepare Swirl for deployment.
-
-
-Here is your **Setup Instructions** section, fully rewritten in clean Markdown and wrapped inside a **Markdown code block**, exactly as requested.
-
----
-
-````markdown
 ## Setup Instructions for the Swirl Docker Compose Deployment
 
 Follow the steps below to install and run Swirl using Docker Compose.
@@ -154,7 +143,6 @@ Stop Swirl using:
 ---
 
 Swirl should now be running and accessible at your configured domain.
-
 
 
 # 2. All Configuration Settings (Categorized)
