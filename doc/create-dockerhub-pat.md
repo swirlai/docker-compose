@@ -1,14 +1,3 @@
-Here is the **Markdown code block** with step-by-step instructions for creating a **Docker Hub Personal Access Token (PAT)** — suitable for read-only access (pull-only permissions).
-
----
-
-```markdown
-## Creating a Docker Hub Personal Access Token (PAT) — Read-Only
-
-Follow the steps below to create a Docker Hub Personal Access Token (PAT) that can be used for authenticated image pulls.
-
----
-
 ### 1. Log in to Docker Hub
 
 Go to:
