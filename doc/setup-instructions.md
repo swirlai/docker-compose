@@ -91,14 +91,13 @@ Run the setup script a second time:
 
 You will see Swirl services start according to your `.env` settings.
 
-Full startup may take several minutes.
-Once logs indicate successful initialization, visit:
+Full startup may take several minutes. Once logs indicate successful initialization, Swirl is now running in the foreground.
+You should able to visit:
 
 ```
 http(s)://<FQDN>
 ```
-
-Swirl is now running **in the foreground**.
+And see the login page. You can login to swirl w/ the admin credentials that to configured in your .env file.
 
 To stop it:
 
