@@ -252,7 +252,7 @@ Int the env.example file you will see the phrase CHANGE_ME next to several setti
 
 ---
 
-## 🟥 Secrets (Must Not Be Committed to Git)
+## 🟥 Secrets
 
 | Name | Default Value | Comment |
 |------|---------------|---------|
