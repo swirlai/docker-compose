@@ -90,7 +90,7 @@ Run:
 echo "<YOUR_PAT>" | docker login -u <your-docker-username> --password-stdin
 ````
 
-or use the Swirl script
+or use the Swirl Docker Login script
 ```sh
 ./scripts/docker_loginsh
 ````
@@ -103,4 +103,4 @@ Login Succeeded
 
 ---
 
-You now have a secure, read-only Docker Hub PAT suitable for image pulls in scripts, Swirl deployments, CI/CD pipelines, and container orchestrators.
+You now have a secure, read-only Docker Hub PAT suitable for image pulls in scripts for Swirl deployments.
