@@ -134,7 +134,7 @@ Stop Swirl using:
 ./scripts/stop-swirl.sh
 ```
 
-### 7. Configure ODIC with Microsoft as th IDP
+### 8. Configure ODIC with Microsoft as th IDP
 1. Create an App Registration according to [instructions](https://docs.swirlaiconnect.com/M365-Guide.html)
 2. Edit the `.env` file entries to included the client ID and tenant :
 
