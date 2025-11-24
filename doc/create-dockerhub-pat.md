@@ -1,45 +1,61 @@
-## Creating a GitHub Classic Personal Access Token (PAT) — Read-Only
-
-Follow these steps to create a GitHub Classic PAT with read-only access, suitable for pulling private images or repositories.
+Here is the **Markdown code block** with step-by-step instructions for creating a **Docker Hub Personal Access Token (PAT)** — suitable for read-only access (pull-only permissions).
 
 ---
 
-### 1. Log in to GitHub
+```markdown
+## Creating a Docker Hub Personal Access Token (PAT) — Read-Only
+
+Follow the steps below to create a Docker Hub Personal Access Token (PAT) that can be used for authenticated image pulls.
+
+---
+
+### 1. Log in to Docker Hub
+
 Go to:
 
 ```
 
-[https://github.com/settings/tokens](https://github.com/settings/tokens)
+[https://hub.docker.com/](https://hub.docker.com/)
 
 ```
 
-Make sure you are logged into the correct GitHub account.
+Sign in with your Docker Hub account.
 
 ---
 
-### 2. Open the Classic Tokens Page
+### 2. Open the Security Settings
+
+Click your profile icon (top right) → **Account Settings**
+
+Then select:
+
+**Security → Access Tokens**
+
+Or go directly to:
+
+```
+
+[https://hub.docker.com/settings/security](https://hub.docker.com/settings/security)
+
+```
+
+---
+
+### 3. Create a New Access Token
 
 Click:
 
-**Developer settings → Personal access tokens → Tokens (classic)**
-
-Or use the direct link:
-
 ```
 
-[https://github.com/settings/tokens](https://github.com/settings/tokens)
+New Access Token
 
 ```
-
-Then click:
-
-**Generate new token → Generate new token (classic)**
 
 ---
 
-### 3. Give the Token a Name
+### 4. Name the Token
 
-Enter a descriptive name such as:
+Provide a descriptive name, such as:
 
 ```
 
@@ -49,69 +65,58 @@ Swirl Docker Pull Token
 
 ---
 
-### 4. Set an Expiration
+### 5. Select Token Permissions (Read-Only)
 
-Choose **30 days**, **60 days**, or a custom expiration window based on your security needs.
+Choose the permission level:
 
----
+- **Read Only**
+  Allows pulling images from your Docker Hub repositories without granting write or admin access.
 
-### 5. Select Read-Only Scopes
-
-To create a minimal-privilege, read-only PAT, check **ONLY** the following:
-
-#### Recommended for Docker image pulls or repo read access:
-
-- **repo:status**
-- **repo:read**
-  - *This automatically includes `repo:read` permissions needed to clone or pull.*
-
-Do **NOT** select write or admin scopes.
-
-Your selected scopes should look like:
-
-- [x] `repo` (Read Only)
-  - Includes: repo:status, repo_deployment, public_repo, repo:invite
-
-*(Do NOT select `repo:write`, `repo:admin` or any non-repo scopes unless required.)*
+This is the safest setting for automated deployments.
 
 ---
 
 ### 6. Generate the Token
 
-Scroll to the bottom and click:
+Click:
 
 ```
 
-Generate token
+Generate
 
 ````
 
----
-
-### 7. Copy and Save the Token
-
-GitHub will display the token **once only**.
-
-Copy it and store it securely:
-
-- in a secrets manager
-- as a GitHub Actions secret
-- in Docker credential helpers
-- **never** in plain text or source control
+Docker Hub will now show the token **once only**.
 
 ---
 
-### 8. Use the Token for Docker Login (example)
+### 7. Copy and Save the Token Securely
+
+Store the token in a secure location:
+
+- a secrets manager
+- `.env` file (not committed)
+- CI/CD secret store
+- Docker credential helper
+
+You will not be able to view it again.
+
+---
+
+### 8. Use the Token to Log In via CLI
+
+Run:
 
 ```sh
-echo "<PAT_TOKEN>" | docker login ghcr.io -u <github-username> --password-stdin
+echo "<YOUR_PAT>" | docker login -u <your-docker-username> --password-stdin
 ````
 
-Or with the Swirl docker login script :
-```sh
-./scripts/docker_login.sh
-````
+If successful, you will see:
+
+```
+Login Succeeded
+```
 
 ---
 
-You now have a **read-only, minimal-privilege GitHub Classic PAT** ready for use.
+You now have a secure, read-only Docker Hub PAT suitable for image pulls in scripts, Swirl deployments, CI/CD pipelines, and container orchestrators.
