@@ -59,7 +59,7 @@ Important notes:
 
 Create a **Docker Hub Personal Access Token (PAT)** for your Docker Hub user.
 
-Then log in:
+Then log in using it with this script:
 
 ```sh
 ./scripts/docker_login.sh
@@ -97,17 +97,18 @@ You should able to visit:
 ```
 http(s)://<FQDN>
 ```
-And see the login page. You can login to swirl w/ the admin credentials that to configured in your .env file.
+And see the login page. You can login to swirl w/ the admin credentials that to configured in your `.env` file.
 
 To stop it:
 
 * Press **Ctrl+C**
 
-To manage it as a system service:
+To start, stop and monitor it as a system service:
 
 ```sh
 sudo systemctl start swirl
 sudo systemctl stop swirl
+sudo journalctl -f -u swirl
 ```
 
 ---
