@@ -30,7 +30,11 @@ Or go directly to:
 
 Click:
 
-***New Access Token***
+***Personal Access Tokens***
+
+Then
+
+***Generate New Token***
 
 
 ---
@@ -51,8 +55,6 @@ Choose the permission level:
 
 - **Read Only**
   Allows pulling images from your Docker Hub repositories without granting write or admin access.
-
-This is the safest setting for automated deployments.
 
 ---
 
