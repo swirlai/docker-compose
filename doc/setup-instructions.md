@@ -135,8 +135,9 @@ Stop Swirl using:
 ```
 
 ### 7. Configure ODIC with Microsoft as th IDP
-1. Create an App Registration according to instructions here (Erik?)
-2. Edit the `.env` file entries to included the cleint ID and tenant :
+1. Create an App Registration according to [instructions](https://docs.swirlaiconnect.com/M365-Guide.html)
+2. Edit the `.env` file entries to included the client ID and tenant :
+
 ```sh
 # Uncomment and set the following if you want to use Microsoft authentication
 MS_AUTH_CLIENT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
