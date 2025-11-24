@@ -57,7 +57,7 @@ Important notes:
 
 ### 5. Authenticate to Docker Hub
 
-Create a [Docker Hub Personal Access Token (PAT)](doc/create-dockerhub-pat.md) for your Docker Hub user.
+Create a [Docker Hub Personal Access Token (PAT)](./create-dockerhub-pat.md) for your Docker Hub user.
 
 Then log in using it with this script:
 
