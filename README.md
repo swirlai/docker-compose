@@ -27,6 +27,7 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 > **Note:** Swirl does support use of a proxy server between Swirl and target systems. Refer to section TBD for more information.
 
 ## Installation Steps
+- [Set up Instructions](doc/setup-instructions.md)
 - [Downloading Swirl Enterprise](doc/downloading-swirl-enterprise-docker-environment.md)
 - [Setting up Docker Support on Host OS](doc/docker-package-setup-ubuntu.md)
 - [Setting up the Swirl Service](doc/service-setup.md)
@@ -39,7 +40,7 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
     - [Bring Your Own Certificate (BYOC)](doc/service-setup.md#bring-your-own-certificate-byoc)
     - [TLS Configuration with Let's Encrypt & Certbot (optional)](doc/service-setup.md#tls-configuration-with-lets-encrypt--certbot-optional)
 - [License](doc/service-setup.md#licensing)
-- [Database](doc/service-setup.md#database) 
+- [Database](doc/service-setup.md#database)
     - [PostgreSQL](doc/service-setup.md#postgresql)
 - [Connecting Swirl to the Enterprise](doc/service-setup.md#connecting-swirl-to-the-enterprise)
     - [Connecting to Microsoft IDP](doc/service-setup.md#connecting-to-microsoft-idp)
@@ -49,7 +50,7 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
     - Start, stop, and restart the Swirl service.
     - View logs and status of the service.
     - Manage service configuration.
-    
+
 # Additional Documentation
 
 [Overview](https://docs.swirlaiconnect.com/) | [Quick Start](https://docs.swirlaiconnect.com/Quick-Start) | [User Guide](https://docs.swirlaiconnect.com/User-Guide) | [Admin Guide](https://docs.swirlaiconnect.com/Admin-Guide) | [M365 Guide](https://docs.swirlaiconnect.com/M365-Guide) | [Developer Guide](https://docs.swirlaiconnect.com/Developer-Guide) | [Developer Reference](https://docs.swirlaiconnect.com/Developer-Reference) | [AI Search Guide](https://docs.swirlaiconnect.com/AI-Search.html) | [AI Search Assistant Guide](https://docs.swirlaiconnect.com/AI-Search-Assistant.html)

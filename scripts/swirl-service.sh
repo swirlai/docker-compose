@@ -120,18 +120,18 @@ else
         log "Service .plist file successfully copied to ~/Library/LaunchAgents/com.swirl.service.plist"
 
         # Verifies if the current shell is a valid GUI session
+        # Verifies if the current shell is a valid GUI session
         if launchctl print "gui/$(id -u)" &>/dev/null; then
-            log "Setup: Session supports user-level LaunchAgent. Bootstrapping..."
-
-            launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.swirl.service.plist 2>/dev/null || true
-            launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.swirl.service.plist
-            launchctl enable gui/$(id -u)/com.swirl.service
-
-            log "Setup: LaunchAgent bootstrapped successfully."
-            log "To start Swirl manually, run the following command in a terminal: 'launchctl kickstart -k gui/\$(id -u)/com.swirl.service'"
+            log "Setup: Session supports user-level LaunchAgent."
+            log "Setup: LaunchAgent installed but NOT started automatically."
+            log "Setup: To start Swirl manually, run the following commands in a terminal:"
+            log "    launchctl bootstrap gui/\$(id -u) \$HOME/Library/LaunchAgents/com.swirl.service.plist"
+            log "    launchctl kickstart -k gui/\$(id -u)/com.swirl.service"
         else
             log "WARNING: Current shell is not a GUI session."
-            log "You must manually run the following command in a terminal: 'launchctl bootstrap gui/\$(id -u) ~/Library/LaunchAgents/com.swirl.service.plist'"
+            log "WARNING: After logging into the macOS GUI, open Terminal and run:"
+            log "    launchctl bootstrap gui/\$(id -u) \$HOME/Library/LaunchAgents/com.swirl.service.plist"
+            log "    launchctl kickstart -k gui/\$(id -u)/com.swirl.service"
         fi
     elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
         log "Setup: Running on Linux."
@@ -227,7 +227,7 @@ if [ "$USE_NGINX" == "true" ]; then
                 }
                 ' "$TEMPLATE_FILE" > tmp && mv tmp "$TEMPLATE_FILE"
             fi
-            
+
             OPTIONS_FILE="$PARENT_DIR/certbot/conf/options-ssl-nginx.conf"
             DHPARAMS_FILE="$PARENT_DIR/certbot/conf/ssl-dhparams.pem"
 
