@@ -1,5 +1,9 @@
 #!/bin/bash
 
+####
+# This runs Swirl, it can be invoked directly or via system services.
+####
+
 # Exit immediately if a command exits with a non-zero status
 set -e
 
@@ -20,38 +24,6 @@ function error() {
     echo "[$(date +%Y-%m-%dT%H:%M:%S) ${STAGE} ERROR] $1"
 }
 
-# Function to determine active Docker Compose profiles based on environment variables
-function get_active_profiles() {
-    local profiles="svc"
-
-    if [ "$USE_LOCAL_POSTGRES" == "true" ]; then
-        profiles="$profiles,db"
-    fi
-
-    # Add Nginx profile if enabled
-    if [ "$USE_NGINX" == "true" ]; then
-        profiles="$profiles,nginx"
-
-        # Add Certbot profile if using TLS without owned certificate
-        if [ "$USE_TLS" == "true" ] && [ "$USE_CERT" == "false" ]; then
-            profiles="$profiles,certbot"
-        fi
-    fi
-
-    # Add MCP profile if enabled
-    if [ "$MCP_ENABLED" == "true" ]; then
-        profiles="$profiles,mcp"
-    fi
-
-    # Add setup profile if one-time job hasn't been completed
-    local ONETIME_JOB_FLAG="$PARENT_DIR/.swirl-application-setup-job-complete.flag"
-    if [ ! -f "$ONETIME_JOB_FLAG" ]; then
-        profiles="$profiles,setup"
-    fi
-
-    echo "$profiles"
-}
-
 
 # Ensure log directory exists and redirect output to log file
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -63,7 +35,7 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
 fi
 mkdir -p "$LOG_DIR"
 log "Log directory successfully created."
-exec > >(tee -a "$LOG_DIR/swirl.log") 2>&1  
+exec > >(tee -a "$LOG_DIR/swirl.log") 2>&1
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 log "Script directory: $SCRIPT_DIR"
@@ -90,6 +62,8 @@ fi
 
 # Load environment variables from .env
 source "$ENV_FILE"
+source "$PARENT_DIR/scripts/swirl-shared.sh"
+
 
 # Check Properly Configured Environment Variables
 if [ -z "$SWIRL_FQDN" ]; then
@@ -101,18 +75,6 @@ if [ -z "$SWIRL_VERSION" ] || [ -z "$TIKA_VERSION" ] || [ -z "$TTM_VERSION" ]; t
     exit 1
 fi
 
-    # check for local images
-    if "${DOCKER_BIN}" inspect "swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}" > /dev/null 2>&1; then
-        log "Setup: Found local Swirl image swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}"
-    else
-        log "Setup: Local Swirl image swirlai/release-swirl-search-enterprise:${SWIRL_VERSION} not found. Pulling images from Docker Hub."
-        "${DOCKER_BIN}" compose -f $PARENT_DIR/docker-compose.yml --profile $(get_active_profiles) pull --quiet
-    fi
-
-    log "Setup: Setup starting..."
-    log "Setup: Enabling Swirl service to start on boot..."
-
-    
 
 # Stop previously running Swirl containers
 log "Stopping any Swirl containers from previous run"
@@ -169,7 +131,7 @@ if [ "$USE_NGINX" == "true" ]; then
                 }
                 ' "$TEMPLATE_FILE" > tmp && mv tmp "$TEMPLATE_FILE"
             fi
-            
+
             OPTIONS_FILE="$PARENT_DIR/certbot/conf/options-ssl-nginx.conf"
             DHPARAMS_FILE="$PARENT_DIR/certbot/conf/ssl-dhparams.pem"
 
