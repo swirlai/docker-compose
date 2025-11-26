@@ -183,6 +183,7 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     fi
     sudo systemctl enable swirl
 
+    log "Install docker images and you can start and monitor the service."
     log "Start Service via: systemctl start swirl"
     log "Monitor Service via: journalctl -u swirl"
 
