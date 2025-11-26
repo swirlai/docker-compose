@@ -46,25 +46,35 @@ Important notes:
 
 ---
 
-### 4. Authenticate to Docker Hub
-
-Create a [Docker Hub Personal Access Token (PAT)](./create-dockerhub-pat.md) for your Docker Hub user.
-
-Then log in using it with this script:
-
-```sh
-./scripts/docker_login.sh
-```
-
----
-
-### 5. Prepare the Host
+### 4. Prepare the Host
 
 Run the install script:
 
 ```sh
 sudo scripts/install.sh
 ````
+
+---
+
+
+### 5. Authenticate to Docker Hub
+
+Create a [Docker Hub Personal Access Token (PAT)](./create-dockerhub-pat.md) for your Docker Hub user.
+
+Then log in using it with this script:
+
+```sh
+sudo ./scripts/docker_login.sh
+```
+
+---
+
+### 6. Install docker images
+
+
+```sh
+sudo ./scripts/docker_login.sh
+```
 
 ---
 
@@ -209,7 +219,7 @@ Int the env.example file you will see the phrase CHANGE_ME next to several setti
 | LOGOUT_REDIRECT_URL | "" | Post-logout redirect |
 | PAGE_CACHE_REDIS_URL | redis://redis:6379/7 | Redis cache for pages |
 | PGBOUNCER_PRODUCTION | "" | Optional PGBouncer settings |
-| PROTOCOL | http | CHANGE_ME – Must match swirl UI protocol |
+| PROTOCOL | http | CHANGE_ME – Must match swirl UI protocol, change to https if using TLS |
 | SEARCH_RESULT_STORE_REDIS_URL | redis://redis:6379/2 | Redis store for search results |
 | SEARCH_RESULTS_STORE_TIMEOUT | 300 | Seconds before search results expire |
 | SHOULD_USE_TOKEN_FROM_OAUTH | True | Use OAuth token forwarded by client |
@@ -223,7 +233,7 @@ Int the env.example file you will see the phrase CHANGE_ME next to several setti
 | SWIRL_FQDN | localhost | CHANGE_ME – Public hostname, set to your FDQN if you've created a DNS entry for it|
 | SWIRL_LOG_DEBUG | "" | Enable debug logging |
 | SWIRL_LICENSE | '' | CHANGE_ME – Enterprise license key, acquire this from Swirl, make sure to add it between the single quotes |
-| SWIRL_PORT | "" | CHANGE_ME – Must be 8000 for OIDC local use |
+| SWIRL_PORT | "8000" | CHANGE_ME - remove if not using localhost directly with no gateway |
 | SWIRL_RAG_CHAT_INTERACTION_APPROACH | ChatGAIGuided | RAG conversation approach |
 | SWIRL_RAG_DISTRIBUTION_STRATEGY | RoundRobin | RAG distribution strategy |
 | SWIRL_SVC | swirl | Main service identifier |
