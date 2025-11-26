@@ -43,6 +43,7 @@ Important notes:
 * If **USE_TLS=true** and **USE_NGINX=true**, ensure ports **80** and **443** are open.
 * Add DNS entries for the **fully qualified domain name (FQDN)** you will use for accessing Swirl.
 
+[See Configuration Table for more information](#-general-settings)
 
 ---
 
