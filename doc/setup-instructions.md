@@ -65,7 +65,7 @@ Create a [Docker Hub Personal Access Token (PAT)](./create-dockerhub-pat.md) for
 Then log in using it with this script:
 
 ```sh
-sudo ./scripts/docker_login.sh
+sudo ./scripts/docker-login.sh
 ```
 
 ---

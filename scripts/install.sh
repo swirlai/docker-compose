@@ -64,6 +64,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sudo apt-get install -y
 fi
 
+# Get our location in the file system
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 log "Script directory: $SCRIPT_DIR"
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
