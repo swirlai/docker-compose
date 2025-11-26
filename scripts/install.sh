@@ -26,7 +26,7 @@ log "This script will require Sudo at several points you will be prompted for ad
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 
     ## Che for minimum disk space
-     MIN_FREE_GB=60
+    MIN_FREE_GB=60
     avail_kb=$(df --output=avail / | tail -n 1)
     avail_gb=$((avail_kb / 1024 / 1024))
 
@@ -35,7 +35,6 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         error "Consider resizing the VM disk or attaching a larger data disk and configuring containerd to use it."
         exit 1
     fi
-
 
     # Setup Official Docker Repository for later installs
     sudo apt-get install -y ca-certificates curl
