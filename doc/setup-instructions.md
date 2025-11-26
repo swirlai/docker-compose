@@ -74,7 +74,7 @@ sudo ./scripts/docker_login.sh
 
 
 ```sh
-sudo ./scripts/docker_login.sh
+sudo ./scripts/install-docker-images.sh
 ```
 
 ---
