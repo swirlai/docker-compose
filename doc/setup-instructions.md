@@ -11,6 +11,7 @@ This document explains how to configure and deploy Swirl by providing:
 You may deploy Swirl on:
 
 - **Linux (Ubuntu 24.04 LTS recommended)**
+  - See [Minimum System Requirements](../README.md#minimum-system-requirements)
 - **macOS (Darwin)**
 
 ---
@@ -27,18 +28,7 @@ cd swirl-enterprise-compose
 
 ---
 
-### 3. Prepare the Host
-
-#### **On Linux**
-Run the setup script:
-
-```sh
-sudo setup/ubuntu24_04.sh
-````
-
----
-
-### 4. Create Your Environment File
+### 3. Create Your Environment File
 
 Copy the example environment file:
 
@@ -53,9 +43,10 @@ Important notes:
 * If **USE_TLS=true** and **USE_NGINX=true**, ensure ports **80** and **443** are open.
 * Add DNS entries for the **fully qualified domain name (FQDN)** you will use for accessing Swirl.
 
+
 ---
 
-### 5. Authenticate to Docker Hub
+### 4. Authenticate to Docker Hub
 
 Create a [Docker Hub Personal Access Token (PAT)](./create-dockerhub-pat.md) for your Docker Hub user.
 
@@ -64,6 +55,16 @@ Then log in using it with this script:
 ```sh
 ./scripts/docker_login.sh
 ```
+
+---
+
+### 5. Prepare the Host
+
+Run the install script:
+
+```sh
+sudo scripts/install.sh
+````
 
 ---
 
