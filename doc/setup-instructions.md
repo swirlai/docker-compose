@@ -87,8 +87,8 @@ To start, stop and monitor it as a system service:
 
 ```sh
 sudo systemctl start swirl
-sudo systemctl stop swirl
 sudo journalctl -f -u swirl
+sudo systemctl stop swirl
 ```
 
 ---
