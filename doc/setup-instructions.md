@@ -79,41 +79,9 @@ sudo ./scripts/install-docker-images.sh
 
 ---
 
-### 6. Initialize Swirl
-
-Run the Swirl service setup script:
-
-```sh
-./scripts/swirl-service.sh
-```
-
-This script pulls the necessary images and applies configuration.
-
----
-
-### 7. Start Swirl
+### 6. Start Swirl
 
 #### **On Linux**
-
-Run the setup script a second time:
-
-```sh
-./scripts/swirl-service.sh
-```
-
-You will see Swirl services start according to your `.env` settings.
-
-Full startup may take several minutes. Once logs indicate successful initialization, Swirl is now running in the foreground.
-You should able to visit:
-
-```
-http(s)://<FQDN>
-```
-And see the login page. You can login to swirl w/ the admin credentials that to configured in your `.env` file.
-
-To stop it:
-
-* Press **Ctrl+C**
 
 To start, stop and monitor it as a system service:
 
@@ -130,14 +98,13 @@ sudo journalctl -f -u swirl
 Start Swirl using `launchctl`:
 
 ```sh
-launchctl bootstrap gui/$(id -u) $HOME/Library/LaunchAgents/com.swirl.service.plist
 launchctl kickstart -k gui/$(id -u)/com.swirl.service
 ```
 
 Monitor the startup logs:
 
 ```sh
-tail -f $HOME/tmp/log/swirl-service.out
+tail -f $HOME/tmp/log/swirl-service.out $HOME/tmp/log/swirl-service.out
 ```
 
 Stop Swirl using:
@@ -146,7 +113,11 @@ Stop Swirl using:
 ./scripts/stop-swirl.sh
 ```
 
-### 8. Configure ODIC with Microsoft as th IDP
+Swirl should now be running and accessible at your configured domain.
+
+---
+
+### 8. Configure ODIC with Microsoft as th IDP (Optional)
 1. Create an App Registration according to [instructions](https://docs.swirlaiconnect.com/M365-Guide.html)
 2. Edit the `.env` file entries to included the client ID and tenant :
 
@@ -168,11 +139,6 @@ If you're accessing Swirl through https and standard ports:
 PROTOCOL="https"
 SWIRL_PORT=""
 ```
-
----
-
-Swirl should now be running and accessible at your configured domain.
-
 
 # 2. All Configuration Settings (Categorized)
 
