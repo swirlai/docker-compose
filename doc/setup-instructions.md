@@ -204,8 +204,8 @@ Int the env.example file you will see the phrase CHANGE_ME next to several setti
 | SWIRL_RAG_CHAT_INTERACTION_APPROACH | ChatGAIGuided | RAG conversation approach |
 | SWIRL_RAG_DISTRIBUTION_STRATEGY | RoundRobin | RAG distribution strategy |
 | SWIRL_SVC | swirl | Main service identifier |
-| SWIRL_TEXT_SUMMARIZATION_URL | http://ttm:7029 | Summarization service |
-| TIKA_SERVER_ENDPOINT | http://tika:9998 | Tika server endpoint |
+| SWIRL_TEXT_SUMMARIZATION_URL | "http://ttm:7029" | Summarization service |
+| TIKA_SERVER_ENDPOINT | "http://tika:9998" | Tika server endpoint |
 
 ---
 
