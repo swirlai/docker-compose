@@ -99,15 +99,6 @@ if [ -z "$SWIRL_VERSION" ] || [ -z "$SWIRL_PATH" ]; then
     exit 1
 fi
 
-# check for local images and pull if not found
-if "${DOCKER_BIN}" inspect "${SWIRL_PATH}:${SWIRL_VERSION}" > /dev/null 2>&1; then
-    log "Found local Swirl image ${SWIRL_PATH}:${SWIRL_VERSION}"
-else
-    log "Local Swirl image ${SWIRL_PATH}:${SWIRL_VERSION} not found. Pulling images from Docker Hub."
-    log "Pulling for profiles: $(get_active_profiles)"
-    COMPOSE_PROFILES="$(get_active_profiles)" "${DOCKER_BIN}" compose -f $PARENT_DIR/docker-compose.yml  pull --quiet
-fi
-
 
 if [ "$USE_TLS" == "true" ]; then
     if [ "$USE_CERT" == "false" ]; then
@@ -192,6 +183,6 @@ else
 fi
 # prevent setup on subsequent runs
 #touch "$SERVICE_SETUP_FLAG"
-log "Setup complete"
+log "Host setup complete"
 exit 0
 fi
