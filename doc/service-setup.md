@@ -44,7 +44,7 @@ This is primarily intended for development and testing purposes.
 
 ```bash
 USE_CERT=false
-USE_NGINX=true
+USE_NGINX=false
 USE_TLS=false
 ```
 When the service starts, certbot is not used, and the service runs without TLS.
