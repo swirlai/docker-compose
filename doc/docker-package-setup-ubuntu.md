@@ -5,7 +5,7 @@ most recent long-term support release of Ubuntu ([24.04 LTS](https://releases.ub
 
 # Ubuntu 24.04 LTS
 
-This [ubuntu24_04.sh](../scripts/install.sh) script automates the setup
+This [install.sh](../scripts/install.sh) script automates the setup
 of the official Docker repository and installs Docker-related tools on an
 Ubuntu 24.04 system. Below is a step-by-step explanation of the script:
 
