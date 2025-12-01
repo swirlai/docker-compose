@@ -6,7 +6,7 @@ Swirl runs in a Docker compose environment controlled by a service.
 2. [Prerequisites](#prerequisites)
    - [Setting Up Docker Support on Host OS](../doc/docker-package-setup-ubuntu.md)
    - [Docker Credentials](#docker-credentials)
-3. [Service Setup](#service-setup)
+3. [Service Setup Instructions](../doc/setup-instructions.md)
 4. [TLS Scenarios](#tls-scenarios)
     - [No TLS](#no-tls)
     - [Bring Your Own Certificate (BYOC)](#bring-your-own-certificate-byoc)
@@ -33,18 +33,6 @@ you can obtain them by contacting Swirl support(via [email](mailto:hello@swirlai
 This will cache authentication credentials in the Docker configuration file, allowing the service to pull images from the Swirl
 Enterprise Docker registry without requiring manual login each time.
 
-
-## Service Setup
-On first execution [scripts/swirl-service.sh](../scripts/swirl-service.sh) does the following:
-- Optionally downloads Certbot configuration files for TLS setup (when: USE_TLS=true, USE_CERT=false).
-- Pulls required Docker images from the Swirl Enterprise Docker registry.
-- Configures the service (Systemd for Ubuntu, launchctl for MacOS).
-
-See [Controlling Swirl Service](../doc/controlling-swirl-service.md) for more details on how to control the service.
-
-
-*Note*: The service script creates a `.swirl-service-setup-complete.flag` file to indicate that the setup has been completed.
-If you need to re-run the setup, you can delete this flag file.
 
 ## TLS Scenarios
 ### No TLS
