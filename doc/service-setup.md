@@ -29,7 +29,7 @@ you can obtain them by contacting Swirl support(via [email](mailto:hello@swirlai
 
 - [Generate a personal access token (PAT)](https://docs.docker.com/security/access-tokens/) [See also](../doc/create-dockerhub-pat.md)
 - Login to the Swirl Enterprise Docker registry either manually or via the [scripts/docker_login.sh](../scripts/docker_login.sh) script
-- Install Swirl Images via the [scripts/scripts/install-docker-images.sh](../scripts/scripts/install-docker-images.sh) script
+- Install Swirl Images via the [scripts/scripts/install-docker-images.sh](../scripts/install-docker-images.sh) script
 
 This will cache authentication credentials in the Docker configuration file, allowing the service to pull images from the Swirl
 Enterprise Docker registry without requiring manual login each time.
