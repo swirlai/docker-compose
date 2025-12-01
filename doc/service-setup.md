@@ -160,7 +160,11 @@ Copy & paste this into the file exactly as it is. Swirl Enterprise will not oper
 
 ## Connecting to Microsoft IDP
 
-If you will be using Microsoft as your IDP, configure the following environment variables in the `.env` file:
+If you will be using Microsoft as your IDP, you need to complete the following configuration steps:
+
+1. [Create a App Registration in your Microsoft Tenant. Note the Client Id, the tenant ID, and the Client Secrete](https://docs.swirlaiconnect.com/M365-Guide.html)
+2. [Start Swirl and update the Microsoft Authentication Provider, filling in the Client and and Secrete](https://docs.swirlaiconnect.com/M365-Guide.html)
+3. Configure the following environment variables in the `.env` file:
 
 | Environment Variable | Description |
 |----------------------|-------------|
