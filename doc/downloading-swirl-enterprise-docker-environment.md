@@ -6,6 +6,6 @@ including the necessary dependencies and services.
 To download the Swirl Enterprise Docker environment, you can clone the repository using the following command:
 
 ```bash
-git clone -b develop https://github.com/swirlai/docker-compose swirl-enterprise-compose
+git clone -b <version-number> https://github.com/swirlai/docker-compose swirl-enterprise-compose
 cd swirl-enterprise-compose
 ```
