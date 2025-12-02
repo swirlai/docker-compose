@@ -128,7 +128,11 @@ Stop SWIRL using:
 ./scripts/stop-swirl.sh
 ```
 
-**SWIRL should now be running and accessible at the configured domain.**
+SWIRL should now be running and accessible at the configured domain.  Look for a log entry similar to this indicating the service is available:
+
+```
+swirl_app | INFO 2025-12-02 14:33:41 server Listening on TCP address 0.0.0.0:8000
+```
 
 ---
 

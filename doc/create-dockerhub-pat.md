@@ -2,47 +2,33 @@
 
 Go to:
 
-
 [Docker Hub](https://hub.docker.com/)
-
 
 Sign in with your Docker Hub account.
 
 ---
 
-### 2. Open the Security Settings
+### 2. Open Your Account Settings
 
-Click your profile icon (top right) → **Account Settings**
+Click your profile icon (top right) and select:
+**Account Settings**
 
-Then select:
-
-**Security → Access Tokens**
-
-Or go directly to:
-
-
-[Security](https://hub.docker.com/settings/security)
-
+In the new tab that opens, select:
+**Personal access tokens**
 
 ---
 
-### 3. Create a New Access Token
+### 3. Create a New Personal Access Token
 
 Click:
 
-***Personal Access Tokens***
-
-Then
-
-***Generate New Token***
-
+**Generate New Token**
 
 ---
 
-### 4. Name the Token
+### 4. Name the New Token
 
 Provide a descriptive name, such as:
-
 
 ***SWIRL Docker Pull Token***
 
@@ -58,13 +44,11 @@ Choose the permission level:
 
 ---
 
-### 6. Generate the Token
+### 6. Generate the New Token
 
 Click:
 
-
-***Generate***
-
+**Generate**
 
 Docker Hub will now show the token **once only**.
 
@@ -72,13 +56,7 @@ Docker Hub will now show the token **once only**.
 
 ### 7. Copy and Save the Token Securely
 
-Store the token in a secure location:
-
-- a secrets manager
-- CI/CD secret store
-- Docker credential helper
-
-You will not be able to view it again.
+Store the token in a secure location as you will not be able to view it again.
 
 ---
 
@@ -90,7 +68,8 @@ Run:
 echo "<YOUR_PAT>" | docker login -u <your-docker-username> --password-stdin
 ````
 
-or use the SWIRL Docker Login script
+or use the SWIRL Docker Login script:
+
 ```sh
 ./scripts/docker_loginsh
 ````
