@@ -78,16 +78,32 @@ sudo ./scripts/install-docker-images.sh
 
 ---
 
-### 7. Start SWIRL
+### 7. Start SWIRL and Monitor Logs
 
 #### **On Linux**
 
-To start, stop and monitor it as a system service:
+Start SWIRL as a system service:
 
 ```sh
 sudo systemctl start swirl
+```
+
+Monitor all SWIRL logs:
+
+```sh
 sudo journalctl -f -u swirl
+```
+
+Stop SWIRL as a system service:
+
+```sh
 sudo systemctl stop swirl
+```
+
+Restart SWIRL as a system service:
+
+```sh
+sudo systemctl restart swirl
 ```
 
 ---
@@ -100,7 +116,7 @@ Start SWIRL using `launchctl`:
 launchctl kickstart -k gui/$(id -u)/com.swirl.service
 ```
 
-Monitor the startup logs:
+Monitor all SWIRL logs:
 
 ```sh
 tail -f $HOME/tmp/log/swirl-service.out $HOME/tmp/log/swirl-service.err
@@ -112,7 +128,7 @@ Stop SWIRL using:
 ./scripts/stop-swirl.sh
 ```
 
-SWIRL should now be running and accessible at your configured domain.
+**SWIRL should now be running and accessible at the configured domain.**
 
 ---
 
