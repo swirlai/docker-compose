@@ -51,7 +51,7 @@ Important notes:
 Run the install script:
 
 ```sh
-sudo scripts/install.sh
+sudo ./scripts/install.sh
 ````
 
 ---
@@ -132,7 +132,7 @@ Stop SWIRL using:
 
 ---
 
-### Configure ODIC with Microsoft as th IDP (Optional)
+### Configure OIDC with Microsoft as th IDP (Optional)
 1. Create an App Registration according to [these instructions](https://docs.swirlaiconnect.com/M365-Guide.html).
 2. Configure and activate the [Microsoft Authenticator in SWIRL](https://docs.swirlaiconnect.com/M365-Guide.html#configure-the-microsoft-authenticator).
 3. Edit the following `.env` file entries to included the Microsoft client and tenant IDs:
@@ -160,7 +160,7 @@ SWIRL_PORT=""
 
 ---
 
-### Configure ODIC with Google as th IDP (Optional)
+### Configure OIDC with Google as th IDP (Optional)
 1. Create an App Registration according to [these instructions](https://docs.swirlaiconnect.com/GoogleWorkspace-Guide.html).
 2. Configure and activate the [Google Authenticator in SWIRL](https://docs.swirlaiconnect.com/GoogleWorkspace-Guide.html#configure-the-google-authenticator).
 3. Edit the following `.env` file entry to include the unique portion of the Google client ID only:
