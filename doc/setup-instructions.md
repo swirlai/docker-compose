@@ -70,7 +70,7 @@ sudo ./scripts/docker-login.sh
 
 ---
 
-### 6. Install docker images
+### 6. Install Docker images
 
 
 ```sh

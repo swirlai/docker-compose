@@ -48,7 +48,7 @@ tail -f $HOME/tmp/log/swirl-service.out $HOME/tmp/log/swirl-service.err
 ```
 
 ### Docker Monitoring
-As the containers are standard docker containers, you can also monitor them via
+As the containers are standard Docker containers, you can also monitor them via
 - `docker inspect`
 - `docker logs`
 

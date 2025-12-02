@@ -28,13 +28,13 @@ This will perform the following actions:
     - files beneath `/app`
     - SWIRL database in gpg encrypted tar file using `ADMIN_PASSWORD` from `/app/.env`
 - Update `/app/.env`
-- Prompt operator to authenticate with docker hub using
+- Prompt operator to authenticate with Docker hub using
 - Pull the updated SWIRL Docker images
 - Copy required updated files to `/app`, renaming existing with _backup suffix
 - Prompt operator to restart the SWIRL services via `sudo systemctl start swirl`
 
 
-Please note: the updater results in storage of docker  credentials in `/root/.docker/config.json` which can be removed after the update is complete.
+Please note: the updater results in storage of Docker  credentials in `/root/.docker/config.json` which can be removed after the update is complete.
 
 ## Docker Credentials For Updater
 The updater's `docker_login.sh` script prompts the operator to authenticate with Docker Hub using a username and
