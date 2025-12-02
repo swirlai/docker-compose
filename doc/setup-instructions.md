@@ -92,7 +92,7 @@ sudo systemctl stop swirl
 
 ---
 
-#### **On macOS (Darwin)**
+#### **On MacOS (Darwin)**
 
 Start SWIRL using `launchctl`:
 
@@ -126,7 +126,7 @@ SWIRL should now be running and accessible at your configured domain.
 MS_AUTH_CLIENT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 MS_TENANT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 ```
-3. Ensure that the `PROTOCOL` and `SWIRL_PORT` values in `.env` are set to match the SWIRL homepage URL. For example, 
+4. Ensure that the `PROTOCOL` and `SWIRL_PORT` values in `.env` are set to match the SWIRL homepage URL. For example, 
 
 When accessing SWIRL on a local machine:
 ```sh
@@ -139,6 +139,8 @@ When accessing SWIRL through `https` and standard ports:
 PROTOCOL="https"
 SWIRL_PORT=""
 ```
+
+5. Restart the SWIRL service.
 
 ---
 
