@@ -18,7 +18,7 @@ You may deploy SWIRL on:
 
 ### 2. Clone the Repository
 
-Clone the docker-compose repository for the version you want to deploy.
+Clone the docker-compose repository for the version you want to deploy and move into the cloned repository.
 Example:
 
 ```sh
@@ -36,14 +36,13 @@ Copy the example environment file:
 cp env.example .env
 ```
 
-Then **edit `.env`** to match your desired configuration.
+Then **edit `.env`** to match your desired configuration. [Use the Configuration Table for guidance](#-general-settings)
 
 Important notes:
 
 * If **USE_TLS=true** and **USE_NGINX=true**, ensure ports **80** and **443** are open.
 * Add DNS entries for the **fully qualified domain name (FQDN)** you will use for accessing SWIRL.
 
-[See Configuration Table for more information](#-general-settings)
 
 ---
 
