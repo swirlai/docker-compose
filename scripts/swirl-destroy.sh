@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ####
-# Destroys the swirl docker containers and DB volumes with extreme prejudice.
+# Destroys the SWIRL docker containers and DB volumes with extreme prejudice.
 # This is most handy for starting fresh after something has gone wrong.
 ####
 
@@ -28,7 +28,7 @@ DOCKER_BIN="$(command -v docker)"
 
 log "Using compose file: $PARENT_DIR/docker-compose.yml"
 
-log "Bringing down all Swirl services (compose --profile all down)..."
+log "Bringing down all SWIRL services (compose --profile all down)..."
 "$DOCKER_BIN" compose -f "$PARENT_DIR/docker-compose.yml" --profile all down
 
 log "Removing swirl_db_data volume (if it exists)..."
@@ -37,7 +37,7 @@ log "Removing swirl_db_data volume (if it exists)..."
 log "Showing any remaining containers with 'swirl' in the name:"
 "$DOCKER_BIN" ps -a --filter "name=swirl"
 
-log "Removing Swirl flag files..."
+log "Removing SWIRL flag files..."
 rm -f "$PARENT_DIR"/.swirl-*.flag || true
 
 log "Done."

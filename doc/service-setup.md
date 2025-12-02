@@ -1,5 +1,5 @@
 # Overview
-Swirl runs in a Docker compose environment controlled by a service.
+SWIRL runs in a Docker compose environment controlled by a service.
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -13,32 +13,32 @@ Swirl runs in a Docker compose environment controlled by a service.
     - [TLS Configuration with Let's Encrypt & Certbot (optional)](#tls-configuration-with-lets-encrypt--certbot-optional)
 5. [Database](#database)
    - [PostgreSQL](#postgresql)
-6. [Configuring Swirl Enterprise](#configuring-swirl-enterprise)
+6. [Configuring SWIRL Enterprise](#configuring-swirl-enterprise)
     - [Licensing](#licensing)
-7. [Connecting Swirl to the Enterprise](#connecting-swirl-to-the-enterprise)
+7. [Connecting SWIRL to the Enterprise](#connecting-swirl-to-the-enterprise)
     - [Connecting to Microsoft IDP](#connecting-to-microsoft-idp)
 
 ## Prerequisites
 - Docker Compose installed on the host system. (see [Setting Up Docker Support on Host OS](../doc/docker-package-setup-ubuntu.md))
-- Docker login credentials for the Swirl Enterprise Docker registry.
+- Docker login credentials for the SWIRL Enterprise Docker registry.
 - Properly configured `.env` file with the required environment variables.
 
 ### Docker Credentials
-If you do not already have credentials for the Swirl Enterprise Docker registry,
-you can obtain them by contacting Swirl support(via [email](mailto:hello@swirlaiconnect.com) or [ticket](https://swirlaiconnect.com/support-ticket).
+If you do not already have credentials for the SWIRL Enterprise Docker registry,
+you can obtain them by contacting SWIRL support(via [email](mailto:hello@swirlaiconnect.com) or [ticket](https://swirlaiconnect.com/support-ticket).
 
 - [Generate a personal access token (PAT)](https://docs.docker.com/security/access-tokens/) [See also](../doc/create-dockerhub-pat.md)
-- Login to the Swirl Enterprise Docker registry either manually or via the [scripts/docker_login.sh](../scripts/docker_login.sh) script
-- Install Swirl Images via the [scripts/scripts/install-docker-images.sh](../scripts/install-docker-images.sh) script
+- Login to the SWIRL Enterprise Docker registry either manually or via the [scripts/docker_login.sh](../scripts/docker_login.sh) script
+- Install SWIRL Images via the [scripts/scripts/install-docker-images.sh](../scripts/install-docker-images.sh) script
 
-This will cache authentication credentials in the Docker configuration file, allowing the service to pull images from the Swirl
+This will cache authentication credentials in the Docker configuration file, allowing the service to pull images from the SWIRL
 Enterprise Docker registry without requiring manual login each time.
 
 
 ## TLS Scenarios
 ### No TLS
 In this scenario, the service runs without TLS and can be run with our without Nginx.
-If Nginx is not used, the service can be accessed directly via the Swirl port (default 8000).
+If Nginx is not used, the service can be accessed directly via the SWIRL port (default 8000).
 
 This is primarily intended for development and testing purposes.
 
@@ -59,7 +59,7 @@ USE_TLS=true
 ```
 
 For this work, the following must be true:
-- `SWIRL_FQDN` is set to a valid domain name that points to the host running Swirl and is resolved by DNS globally
+- `SWIRL_FQDN` is set to a valid domain name that points to the host running SWIRL and is resolved by DNS globally
 - Certificate and key files from a Certificate Authority (CA) are available in the following directory:
 ```bash
 <INSTALLATION_DIR>/nginx/certificates/ssl/${SWIRL_FQDN}/
@@ -80,7 +80,7 @@ USE_TLS=true
 ```
 
 For this to work the following must be true:
-- `SWIRL_FQDN` is set to a valid domain name that points to the host running Swirl and is resolved by DNS globally
+- `SWIRL_FQDN` is set to a valid domain name that points to the host running SWIRL and is resolved by DNS globally
 - Port 80 and 443 must be open and accessible from the internet
 
 When the system starts, certbot:
@@ -109,9 +109,9 @@ curl -o certbot/conf/ssl-dhparams.pem https://raw.githubusercontent.com/certbot/
 
 ## Database
 
-The local docker-compose.yml file for Swirl Enterprise is configured to use a local instance of PostgreSQL.
+The local docker-compose.yml file for SWIRL Enterprise is configured to use a local instance of PostgreSQL.
 If preferred, you can modify the compose file to connect to an external database service.
-For production environments, Swirl recommends using a dedicated PostgreSQL database such as RDS or Azure Flexible Server.
+For production environments, SWIRL recommends using a dedicated PostgreSQL database such as RDS or Azure Flexible Server.
 
 
 ### PostgreSQL
@@ -120,19 +120,19 @@ Configure the database environment variables (referenced by a `# CHANGE_ME` comm
 in the `.env` file before starting the application:
 
 ```env
-ADMIN_PASSWORD="" # CHANGE_ME  - Swirl application admin password
-SQL_HOST="postgres" # CHANGE_ME  - Swirl DB host name or domain name
-SQL_PORT="5432" # CHANGE_ME  - Swirl DB port
-SQL_USER="" # CHANGE_ME - Swirl DB User name
-SQL_PASSWORD="" # CHANGE_ME  - Swirl DB User password
-SQL_SSLMODE="prefer" # CHANGE_ME  - Swirl DB SSL mode
+ADMIN_PASSWORD="" # CHANGE_ME  - SWIRL application admin password
+SQL_HOST="postgres" # CHANGE_ME  - SWIRL DB host name or domain name
+SQL_PORT="5432" # CHANGE_ME  - SWIRL DB port
+SQL_USER="" # CHANGE_ME - SWIRL DB User name
+SQL_PASSWORD="" # CHANGE_ME  - SWIRL DB User password
+SQL_SSLMODE="prefer" # CHANGE_ME  - SWIRL DB SSL mode
 ```
 
 > For more information see: [Admin Guide - Configuring Django](https://docs.swirl.today/Admin-Guide.html#configuring-django).
 
-## Configuring Swirl Enterprise
+## Configuring SWIRL Enterprise
 ### Licensing
-Add the license provided by Swirl, to the installation's `.env` file. It will be in the
+Add the license provided by SWIRL, to the installation's `.env` file. It will be in the
 following format:
 
 ```env
@@ -142,17 +142,17 @@ SWIRL_LICENSE='{"owner": "<owner-name>", "expiration": "<expiration-date>", "key
 **Note: the single quotes wrapping the JSON string are required or the license fails to parse correctly.**
 
 
-Copy & paste this into the file exactly as it is. Swirl Enterprise will not operate without the correct license configuration.
+Copy & paste this into the file exactly as it is. SWIRL Enterprise will not operate without the correct license configuration.
 
 
-# Connecting Swirl to the Enterprise
+# Connecting SWIRL to the Enterprise
 
 ## Connecting to Microsoft IDP
 
 If you will be using Microsoft as your IDP, you need to complete the following configuration steps:
 
 1. [Create a App Registration in your Microsoft Tenant. Note the Client Id, the tenant ID, and the Client Secrete](https://docs.swirlaiconnect.com/M365-Guide.html)
-2. [Start Swirl and update the Microsoft Authentication Provider, filling in the Client and and Secrete](https://docs.swirlaiconnect.com/M365-Guide.html)
+2. [Start SWIRL and update the Microsoft Authentication Provider, filling in the Client and and Secrete](https://docs.swirlaiconnect.com/M365-Guide.html)
 3. Configure the following environment variables in the `.env` file:
 
 | Environment Variable | Description |

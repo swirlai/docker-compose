@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e  # Exit the script immediately if any command fails
 
-echo "Setting up swirl"
+echo "Setting up SWIRL"
 
 # auto populating Variables
 export PROTOCOL=${PROTOCOL:-http}
@@ -24,7 +24,7 @@ echo "CSRF_TRUSTED_ORIGINS is set to: $CSRF_TRUSTED_ORIGINS"
 
 
 
-# Remove any existing swirl configuration directory
+# Remove any existing SWIRL configuration directory
 rm -rf .swirl
 
 # Collect Django static files and clear any previous ones
@@ -53,5 +53,5 @@ echo "msal and oauth config loading completed"
 sleep 30
 
 # Start background workers and the Daphne web server
-echo "Starting swirl"
+echo "Starting SWIRL"
 python swirl.py start celery-worker celery-healthcheck-worker celery-beats && daphne -b 0.0.0.0 -p ${SWIRL_PORT:-8000} swirl_server.asgi:application;

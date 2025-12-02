@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ####
-# This runs Swirl, it can be invoked directly or via system services.
+# This runs SWIRL, it can be invoked directly or via system services.
 ####
 
 # Exit immediately if a command exits with a non-zero status
@@ -76,8 +76,8 @@ if [ -z "$SWIRL_VERSION" ] || [ -z "$TIKA_VERSION" ] || [ -z "$TTM_VERSION" ]; t
 fi
 
 
-# Stop previously running Swirl containers
-log "Stopping any Swirl containers from previous run"
+# Stop previously running SWIRL containers
+log "Stopping any SWIRL containers from previous run"
 "${DOCKER_BIN}" compose -f $PARENT_DIR/docker-compose.yml --profile all stop
 
 # Conditionally add local Postgres

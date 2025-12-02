@@ -1,6 +1,6 @@
 #!/bin/bash
 ####
-# Shared functions and variables for Swirl scripts. Include after sourcing .env file.
+# Shared functions and variables for SWIRL scripts. Include after sourcing .env file.
 ####
 set -e
 

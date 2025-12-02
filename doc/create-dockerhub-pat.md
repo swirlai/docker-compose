@@ -44,7 +44,7 @@ Then
 Provide a descriptive name, such as:
 
 
-***Swirl Docker Pull Token***
+***SWIRL Docker Pull Token***
 
 
 ---
@@ -90,7 +90,7 @@ Run:
 echo "<YOUR_PAT>" | docker login -u <your-docker-username> --password-stdin
 ````
 
-or use the Swirl Docker Login script
+or use the SWIRL Docker Login script
 ```sh
 ./scripts/docker_loginsh
 ````
@@ -103,4 +103,4 @@ Login Succeeded
 
 ---
 
-You now have a secure, read-only Docker Hub PAT suitable for image pulls in scripts for Swirl deployments.
+You now have a secure, read-only Docker Hub PAT suitable for image pulls in scripts for SWIRL deployments.
