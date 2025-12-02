@@ -78,7 +78,7 @@ sudo ./scripts/install-docker-images.sh
 
 ---
 
-### 6. Start SWIRL
+### 7. Start SWIRL
 
 #### **On Linux**
 
@@ -116,32 +116,49 @@ SWIRL should now be running and accessible at your configured domain.
 
 ---
 
-### 8. Configure ODIC with Microsoft as th IDP (Optional)
-1. Create an App Registration according to [instructions](https://docs.swirlaiconnect.com/M365-Guide.html)
-2. Update the default SWIRL Microsoft Authenticator [instructions](https://docs.swirlaiconnect.com/M365-Guide.html#configure-the-microsoft-authenticator)
-3. Edit the `.env` file entries to included the client ID and tenant :
+### Configure ODIC with Microsoft as th IDP (Optional)
+1. Create an App Registration according to [these instructions](https://docs.swirlaiconnect.com/M365-Guide.html).
+2. Configure and activate the [Microsoft Authenticator in SWIRL](https://docs.swirlaiconnect.com/M365-Guide.html#configure-the-microsoft-authenticator).
+3. Edit the following `.env` file entries to included the Microsoft client and tenant IDs:
 
 ```sh
-# Uncomment and set the following if you want to use Microsoft authentication
+# Uncomment and set the following to use Microsoft authentication.
 MS_AUTH_CLIENT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 MS_TENANT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 ```
-3. In addition, make sure that ```PROTOCOL``` and ```SWIRL_PORT``` are set to match your front page URL,some examples:
-If you're accessing SWIRL on your local machine:
+3. Ensure that the `PROTOCOL` and `SWIRL_PORT` values in `.env` are set to match the SWIRL homepage URL. For example, 
+
+When accessing SWIRL on a local machine:
 ```sh
 PROTOCOL="http"
 SWIRL_PORT="8000"
 ```
 
-If you're accessing SWIRL through https and standard ports:
+When accessing SWIRL through `https` and standard ports:
 ```sh
-## If your running SWIRL on your local machine:
 PROTOCOL="https"
 SWIRL_PORT=""
 ```
-TODO : talk about MS authenticator, we do it someplace else in here as well.
 
-# 2. All Configuration Settings (Categorized)
+---
+
+### Configure ODIC with Google as th IDP (Optional)
+1. Create an App Registration according to [these instructions](https://docs.swirlaiconnect.com/GoogleWorkspace-Guide.html).
+2. Configure and activate the [Google Authenticator in SWIRL](https://docs.swirlaiconnect.com/GoogleWorkspace-Guide.html#configure-the-google-authenticator).
+3. Edit the following `.env` file entry to include the unique portion of the Google client ID only:
+
+```sh
+# Uncomment and set the following to use Google authentication.
+GOOGLE_AUTH_CLIENT_ID="xxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxx"
+```
+
+*NOTE: Do not include the `.apps.googleusercontent.com` in this entry.  Instead, add only the unique ID value that appears before that in the app registration.*
+
+4. Restart the SWIRL service.
+
+---
+
+# All Configuration Settings (Categorized)
 
 Below are all SWIRL configuration variables, grouped by category.
 Any value marked **CHANGE_ME** can be customized.
