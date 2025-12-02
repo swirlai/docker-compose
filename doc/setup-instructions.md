@@ -161,98 +161,137 @@ GOOGLE_AUTH_CLIENT_ID="xxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxx"
 # All Configuration Settings (Categorized)
 
 Below are all SWIRL configuration variables, grouped by category.
-Any value marked **CHANGE_ME** can be customized.
+Any value marked **CHANGE ME** can be customized.
 
 ---
 
-## 🟦 General Settings
+🟦 Image & Version Settings
+| Name             | Default Value                   | Comment                           |
+| ---------------- | ------------------------------- | --------------------------------- |
+| CERTBOT_VERSION  |                                 | Optional explicit Certbot version |
+| NGINX_VERSION    |                                 | Optional explicit Nginx version   |
+| POSTGRES_VERSION | 16                              | Postgres version                  |
+| REDIS_VERSION    | 8                               | Redis version                     |
+| SWIRL_VERSION    | develop                         | SWIRL version/tag                 |
+| SWIRL_PATH       | "swirlai/swirl-search-internal" | Docker image path override        |
+| TIKA_VERSION     | v4_3_0_0                        | Apache Tika server version        |
+| TTM_VERSION      | v4_3_0_0                        | Topic Text Matcher version        |
+| MCP_VERSION      | v1_0_6                          | MCP server version                |
 
-Int the env.example file you will see the phrase CHANGE_ME next to several settings. These are settings you should consider changing to customize your deployment.
+🟩 Ingress / TLS / Certificates
+| Name          | Default Value                                 | Comment                                         |
+| ------------- | --------------------------------------------- | ----------------------------------------------- |
+| USE_CERT      | false                                         | Use bring-your-own certificates                 |
+| USE_NGINX     | false                                         | Enable Nginx reverse proxy                      |
+| USE_TLS       | false                                         | Enable TLS + Certbot                            |
+| CERTBOT_EMAIL | [admin@swirl.today](mailto:admin@swirl.today) | CHANGE ME – Email for Certbot ACME registration |
 
-| Name | Default Value | Comment |
-|------|---------------|---------|
-| CERTBOT_EMAIL | admin@swirl.today | CHANGE_ME – Email used for Certbot certificate registration |
-| CERTBOT_VERSION |  | Certbot version override (optional) |
-| NGINX_VERSION |  | Nginx version override (optional) |
-| POSTGRES_VERSION | 15 | Version of Postgres used |
-| REDIS_VERSION | 7 | Version of Redis used |
-| SWIRL_VERSION | v4_3_0_0 | SWIRL release version |
-| TIKA_VERSION | v4_3_0_0 | Apache Tika server version |
-| TTM_VERSION | v4_3_0_0 | Topic Text Matcher version |
-| USE_CERT | false | CHANGE_ME – Enable Bring your own Cert TLS |
-| USE_LOCAL_POSTGRES | true | CHANGE_ME – Use local Postgres container,or an external Postgres instance |
-| USE_NGINX | false | CHANGE_ME – Enable Nginx reverse proxy, almost always set to true if USE_TLS is true|
-| USE_TLS | false | CHANGE_ME – Enable TLS for SWIRL |
+🟧 SQL Database Settings
+| Name                 | Default Value                   | Comment                                         |
+| -------------------- | ------------------------------- | ----------------------------------------------- |
+| USE_LOCAL_POSTGRES   | true                            | Use bundled Postgres, set false for external DB |
+| SQL_HOST             | "postgres"                      | DB host                                         |
+| SQL_PORT             | "5432"                          | DB port                                         |
+| SQL_SSLMODE          | "prefer"                        | SSL mode for DB                                 |
+| SQL_DATABASE         | "swirl"                         | Database name                                   |
+| SQL_ENGINE           | "django.db.backends.postgresql" | Django database engine                          |
+| PGBOUNCER_PRODUCTION | ""                              | Enable/Configure PgBouncer in production        |
 
----
+🟪 SWIRL Core Application Settings
+| Name                         | Default Value                                    | Comment                                       |
+| ---------------------------- | ------------------------------------------------ | --------------------------------------------- |
+| ADMIN_USER_EMAIL             | "[admin@swirl.today](mailto:admin@swirl.today)"  | Django admin email                            |
+| ALLOWED_HOSTS                | "localhost,127.0.0.1,swirl,"                     | Comma-separated allowed hosts                 |
+| CSRF_TRUSTED_ORIGINS         | "[http://localhost:8000](http://localhost:8000)" | CSRF whitelist origins                        |
+| SWIRL_FQDN                   | "localhost"                                      | Public hostname / DNS name                    |
+| SWIRL_LICENSE                | ''                                               | CHANGE ME – Enterprise license key            |
+| PROTOCOL                     | "http"                                           | Change to https when TLS enabled              |
+| SWIRL_EXPLAIN                | "True"                                           | Enable explain/debug mode                     |
+| AXES_CLIENT_IP_CALLABLE      | ""                                               | IP resolver for Django-Axes                   |
+| SWIRL_ES_VERSION             | "8"                                              | Elasticsearch compatibility                   |
+| IN_PRODUCTION                | "False"                                          | Production flag controlling SSL/host handling |
+| AZ_GOV_COMPATIBLE            | false                                            | Azure GovCloud compatibility mode             |
+| SWIRL_LOG_DEBUG              | ""                                               | Enable module-specific debug logs             |
+| SHOULD_USE_TOKEN_FROM_OAUTH  | "True"                                           | Propagate OAuth token to providers            |
+| SWIRL_SVC                    | "swirl"                                          | Service identifier                            |
+| SWIRL_TEXT_SUMMARIZATION_URL | "[http://ttm:7029](http://ttm:7029)"             | Summarizer service endpoint                   |
+| TIKA_SERVER_ENDPOINT         | "[http://tika:9998](http://tika:9998)"           | Tika server endpoint                          |
 
-## 🟩 SWIRL Application Settings
+🟩 RAG Configuration
+| Name                                | Default Value                          | Comment                                |
+| ----------------------------------- | -------------------------------------- | -------------------------------------- |
+| SWIRL_RAG_CHAT_INTERACTION_APPROACH | "ChatGAIGuided"                        | Chat interaction strategy              |
+| SWIRL_RAG_DISTRIBUTION_STRATEGY     | "RoundRobin"                           | Result generator distribution strategy |
+| SWIRL_TEXT_SUMMARIZATION_URL        | "[http://ttm:7029](http://ttm:7029)"   | Summarizer API                         |
+| TIKA_SERVER_ENDPOINT                | "[http://tika:9998](http://tika:9998)" | Tika processing endpoint               |
 
-| Name | Default Value | Comment |
-|------|---------------|---------|
-| ADMIN_USER_EMAIL | "admin@swirl.today" | CHANGE_ME – Django admin email |
-| ALLOWED_HOSTS | "localhost,127.0.0.1,swirl," | CHANGE_ME – Comma-separated host list, add your FDQN if you've created a DNS entry for it   |
-| AXES_CLIENT_IP_CALLABLE | "" | Optional: Django-Axes IP resolver |
-| AZ_GOV_COMPATIBLE | false | CHANGE_ME – Azure GovCloud compatibility, only set if you're deploying unde Azrue Gov restrictions |
-| CACHE_REDIS_URL | redis://redis:6379/1 | Cache backend |
-| CELERY_BROKER_URL | redis://redis:6379/0 | Celery broker |
-| CELERY_RESULT_BACKEND | redis://redis:6379/0 | Celery result backend |
-| CSRF_TRUSTED_ORIGINS | "http://localhost:8000" | CHANGE_ME – Allowed origins for CSRF, add your FDQN if you've created a DNS entry for it  |
-| GOOGLE_APPLICATION_CREDENTIALS | /app/secrets/google-credentials.json | Path to Google JSON key |
-| IN_PRODUCTION | "False" | Production mode toggle |
-| LOGIN_REDIRECT_URL | "" | Post-login redirect |
-| LOGOUT_REDIRECT_URL | "" | Post-logout redirect |
-| PAGE_CACHE_REDIS_URL | redis://redis:6379/7 | Redis cache for pages |
-| PGBOUNCER_PRODUCTION | "" | Optional PGBouncer settings |
-| PROTOCOL | http | CHANGE_ME – Must match SWIRL UI protocol, change to https if using TLS |
-| SEARCH_RESULT_STORE_REDIS_URL | redis://redis:6379/2 | Redis store for search results |
-| SEARCH_RESULTS_STORE_TIMEOUT | 300 | Seconds before search results expire |
-| SHOULD_USE_TOKEN_FROM_OAUTH | True | Use OAuth token forwarded by client |
-| SQL_DATABASE | SWIRL | Database name,, default is set to be compatible with USE_LOCAL_POSTGRES set to true |
-| SQL_ENGINE | django.db.backends.postgresql | PostgreSQL engine, default is set to be compatible with USE_LOCAL_POSTGRES set to true |
-| SQL_HOST | postgres | CHANGE_ME – Database hostname, default is set to be compatible with USE_LOCAL_POSTGRES set to true |
-| SQL_PORT | 5432 | CHANGE_ME – Database port,, default is set to be compatible with USE_LOCAL_POSTGRES set to true |
-| SQL_SSLMODE | prefer | CHANGE_ME – SSL mode (prefer/require/disable), default is set to be compatible with USE_LOCAL_POSTGRES set to true |
-| SWIRL_ES_VERSION | 8 | Elasticsearch compatibility |
-| SWIRL_EXPLAIN | True | Enable explain output |
-| SWIRL_FQDN | localhost | CHANGE_ME – Public hostname, set to your FDQN if you've created a DNS entry for it|
-| SWIRL_LOG_DEBUG | "" | Enable debug logging |
-| SWIRL_LICENSE | '' | CHANGE_ME – Enterprise license key, acquire this from SWIRL, make sure to add it between the single quotes |
-| SWIRL_PORT | "8000" | CHANGE_ME - remove if not using localhost directly with no gateway |
-| SWIRL_RAG_CHAT_INTERACTION_APPROACH | ChatGAIGuided | RAG conversation approach |
-| SWIRL_RAG_DISTRIBUTION_STRATEGY | RoundRobin | RAG distribution strategy |
-| SWIRL_SVC | SWIRL | Main service identifier |
-| SWIRL_TEXT_SUMMARIZATION_URL | "http://ttm:7029" | Summarization service |
-| TIKA_SERVER_ENDPOINT | "http://tika:9998" | Tika server endpoint |
+🟥 Celery, Redis, and Cache Settings
+| Name                          | Default Value                 | Comment                           |
+| ----------------------------- | ----------------------------- | --------------------------------- |
+| CACHE_REDIS_URL               | "redis://redis-cache:6379/1"  | Cache redis instance              |
+| CELERY_BROKER_URL             | "redis://redis-broker:6379/0" | Celery broker                     |
+| CELERY_RESULT_BACKEND         | "redis://redis-broker:6379/0" | Celery result backend             |
+| PAGE_CACHE_REDIS_URL          | "redis://redis-cache:6379/7"  | Page cache store                  |
+| SEARCH_RESULT_STORE_REDIS_URL | "redis://redis-broker:6379/2" | Search results store              |
+| SEARCH_RESULTS_STORE_TIMEOUT  | "300"                         | Timeout for cached search results |
 
----
+🟦 OIDC / Identity / Authentication
+| Name                             | Default Value | Comment                    |
+| -------------------------------- | ------------- | -------------------------- |
+| GOOGLE_AUTH_CLIENT_ID            | ""            | Google OAuth client ID     |
+| MS_AUTH_CLIENT_ID                | ""            | Microsoft OAuth client ID  |
+| MS_TENANT_ID                     | ""            | Microsoft tenant           |
+| OIDC_AUTHENTICATION_CALLBACK_URL | ""            | OIDC callback              |
+| OIDC_OP_AUTHORIZATION_ENDPOINT   | ""            | Auth endpoint              |
+| OIDC_OP_JWKS_ENDPOINT            | ""            | JWKS URL                   |
+| OIDC_OP_TOKEN_ENDPOINT           | ""            | Token endpoint             |
+| OIDC_OP_USER_ENDPOINT            | ""            | Userinfo endpoint          |
+| OIDC_RP_CLIENT_ID                | ""            | Relying party client ID    |
+| OIDC_RP_CLIENT_SECRET            | ""            | RP secret                  |
+| OIDC_RP_SIGN_ALGO                | ""            | Algorithm                  |
+| OIDC_STORE_ACCESS_TOKEN          | ""            | Store access token         |
+| OIDC_STORE_ID_TOKEN              | ""            | Store ID token             |
+| OIDC_USERNAME_ALGO               | ""            | Username generation method |
 
-## 🟨 Authentication & Identity (OIDC / OAuth)
+🟧 MCP (Machine Control Protocol)
+| Name               | Default Value | Comment                         |
+| ------------------ | ------------- | ------------------------------- |
+| SWIRL_MCP_USERNAME | ""            | Username used by MCP server     |
+| SWIRL_MCP_PASSWORD | ""            | Password used by MCP server     |
+| SWIRL_API_USERNAME | ""            | Username for API-based requests |
+| SWIRL_API_PASSWORD | ""            | API user password               |
 
-| Name | Default Value | Comment |
-|------|---------------|---------|
-| MICROSOFT_CLIENT_ID | "" | Microsoft OAuth client ID, set if you plan to use OIDC with Microsoft as the IDP |
-| MICROSOFT_CLIENT_SECRET | "" | Microsoft OAuth client secret, set if you plan to use OIDC with Microsoft as the IDP |
-| MICROSOFT_REDIRECT_URI | "" | Microsoft OAuth redirect |
-| OIDC_AUTHENTICATION_CALLBACK_URL | "" | OIDC callback URL |
-| OIDC_OP_AUTHORIZATION_ENDPOINT | "" | Authorization endpoint |
-| OIDC_OP_JWKS_ENDPOINT | "" | JWKS endpoint |
-| OIDC_OP_TOKEN_ENDPOINT | "" | Token endpoint |
-| OIDC_OP_USER_ENDPOINT | "" | Userinfo endpoint |
-| OIDC_RP_CLIENT_ID | "" | RP client ID |
-| OIDC_RP_CLIENT_SECRET | "" | RP client secret |
-| OIDC_RP_SIGN_ALGO | "" | Signing algorithm |
-| OIDC_STORE_ACCESS_TOKEN | "" | Store access token |
-| OIDC_STORE_ID_TOKEN | "" | Store ID token |
-| OIDC_USERNAME_ALGO | "" | Username generation method |
+🟥 Secrets
+| Name                           | Default Value | Comment                    |
+| ------------------------------ | ------------- | -------------------------- |
+| ADMIN_PASSWORD                 | ""            | Django admin password      |
+| GOOGLE_CREDENTIALS             | ""            | Google JSON credentials    |
+| SQL_PASSWORD                   | ""            | PostgreSQL password        |
+| SQL_USER                       | ""            | PostgreSQL username        |
+| GOOGLE_APPLICATION_CREDENTIALS | ""            | Path to Google credentials |
 
----
-
-## 🟥 Secrets
-
-| Name | Default Value | Comment |
-|------|---------------|---------|
-| ADMIN_PASSWORD | "" | CHANGE_ME – Django admin password |
-| GOOGLE_CREDENTIALS | "" | CHANGE_ME – Google service account JSON |
-| SQL_PASSWORD | "" | CHANGE_ME – PostgreSQL user password |
-| SQL_USER | "" | CHANGE_ME – PostgreSQL username |
+🟥 Deprecated Variables
+| Name                             | Default Value | Comment           |
+| -------------------------------- | ------------- | ----------------- |
+| GOOGLE_CREDENTIALS               | ""            | Legacy duplicate  |
+| LOGIN_REDIRECT_URL               | ""            | Legacy            |
+| LOGOUT_REDIRECT_URL              | ""            | Legacy            |
+| MICROSOFT_CLIENT_ID              | ""            | Legacy            |
+| MICROSOFT_CLIENT_SECRET          | ""            | Legacy            |
+| MICROSOFT_REDIRECT_URI           | ""            | Legacy            |
+| MCP_ENABLED                      | false         | Old MCP toggle    |
+| MCP_PORT                         | "9000"        | Old MCP port      |
+| MCP_SWIRL_BASE_URL               | "0.0.0.0"     | Old MCP base URL  |
+| MCP_SWIRL_BASE_PATH              | "/api/swirl"  | Old MCP path      |
+| MCP_TIMEOUT                      | "30"          | Old MCP timeout   |
+| OIDC_AUTHENTICATION_CALLBACK_URL | ""            | (Duplicate entry) |
+| OIDC_OP_AUTHORIZATION_ENDPOINT   | ""            | (Duplicate entry) |
+| OIDC_OP_JWKS_ENDPOINT            | ""            | (Duplicate entry) |
+| OIDC_OP_TOKEN_ENDPOINT           | ""            | (Duplicate entry) |
+| OIDC_OP_USER_ENDPOINT            | ""            | (Duplicate entry) |
+| OIDC_RP_CLIENT_ID                | ""            | (Duplicate entry) |
+| OIDC_RP_CLIENT_SECRET            | ""            | (Duplicate entry) |
+| OIDC_RP_SIGN_ALGO                | ""            | (Duplicate entry) |
+| OIDC_STORE_ACCESS_TOKEN          | ""            | (Duplicate entry) |
+| OIDC_STORE_ID_TOKEN              | ""            | (Duplicate entry) |
+| OIDC_USERNAME_ALGO               | ""            | (Duplicate entry) |

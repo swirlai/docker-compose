@@ -116,16 +116,16 @@ For production environments, SWIRL recommends using a dedicated PostgreSQL datab
 
 ### PostgreSQL
 
-Configure the database environment variables (referenced by a `# CHANGE_ME` comment)
+Configure the database environment variables (referenced by a `# CHANGE ME` comment)
 in the `.env` file before starting the application:
 
 ```env
-ADMIN_PASSWORD="" # CHANGE_ME  - SWIRL application admin password
-SQL_HOST="postgres" # CHANGE_ME  - SWIRL DB host name or domain name
-SQL_PORT="5432" # CHANGE_ME  - SWIRL DB port
-SQL_USER="" # CHANGE_ME - SWIRL DB User name
-SQL_PASSWORD="" # CHANGE_ME  - SWIRL DB User password
-SQL_SSLMODE="prefer" # CHANGE_ME  - SWIRL DB SSL mode
+ADMIN_PASSWORD="" # CHANGE ME  - SWIRL application admin password
+SQL_HOST="postgres" # CHANGE ME  - SWIRL DB host name or domain name
+SQL_PORT="5432" # CHANGE ME  - SWIRL DB port
+SQL_USER="" # CHANGE ME - SWIRL DB User name
+SQL_PASSWORD="" # CHANGE ME  - SWIRL DB User password
+SQL_SSLMODE="prefer" # CHANGE ME  - SWIRL DB SSL mode
 ```
 
 > For more information see: [Admin Guide - Configuring Django](https://docs.swirl.today/Admin-Guide.html#configuring-django).
