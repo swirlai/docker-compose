@@ -144,6 +144,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         sudo launchctl enable gui/$(id -u)/com.swirl.service
 
         log "LaunchAgent bootstrapped successfully."
+        log "Login to docker with sudo scripts/docker-login.sh"
+        log "Install docker images with sudo scripts/install-docker-images.sh and you can start and monitor the service."
         log "To start Swirl manually, run the following command in a terminal: 'launchctl kickstart -k gui/\$(id -u)/com.swirl.service'"
     else
         log "Current shell is not a GUI session."

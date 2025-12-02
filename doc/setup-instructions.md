@@ -104,7 +104,7 @@ launchctl kickstart -k gui/$(id -u)/com.swirl.service
 Monitor the startup logs:
 
 ```sh
-tail -f $HOME/tmp/log/swirl-service.out $HOME/tmp/log/swirl-service.out
+tail -f $HOME/tmp/log/swirl-service.out $HOME/tmp/log/swirl-service.err
 ```
 
 Stop Swirl using:
@@ -119,7 +119,8 @@ Swirl should now be running and accessible at your configured domain.
 
 ### 8. Configure ODIC with Microsoft as th IDP (Optional)
 1. Create an App Registration according to [instructions](https://docs.swirlaiconnect.com/M365-Guide.html)
-2. Edit the `.env` file entries to included the client ID and tenant :
+2. Update the default Swirl Microsoft Authenticator [instructions](https://docs.swirlaiconnect.com/M365-Guide.html#configure-the-microsoft-authenticator)
+3. Edit the `.env` file entries to included the client ID and tenant :
 
 ```sh
 # Uncomment and set the following if you want to use Microsoft authentication
@@ -139,11 +140,12 @@ If you're accessing Swirl through https and standard ports:
 PROTOCOL="https"
 SWIRL_PORT=""
 ```
+TODO : talk about MS authenticator, we do it someplace else in here as well.
 
 # 2. All Configuration Settings (Categorized)
 
 Below are all Swirl configuration variables, grouped by category.
-Any value marked **CHANGE_ME** must be customized.
+Any value marked **CHANGE_ME** can be customized.
 
 ---
 
