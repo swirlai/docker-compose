@@ -24,17 +24,17 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 * **Storage:** 500 GB available space
 * **Docker**: v28 or later
 
-> **Note:** Swirl does support use of a proxy server between Swirl and target systems. Refer to section TBD for more information.
+> **Note:** SWIRL does support use of a proxy server between SWIRL and target systems. Refer to section TBD for more information.
 
 ## Installation Steps
 - [Set up Instructions](doc/setup-instructions.md)
-- [Downloading Swirl Enterprise](doc/downloading-swirl-enterprise-docker-environment.md)
+- [Downloading SWIRL Enterprise](doc/downloading-swirl-enterprise-docker-environment.md)
 - [Setting up Docker Support on Host OS](doc/docker-package-setup-ubuntu.md)
-- [Setting up the Swirl Service](doc/service-setup.md)
-- [Controlling Swirl Service](doc/controlling-swirl-service.md)
+- [Setting up the SWIRL Service](doc/service-setup.md)
+- [Controlling SWIRL Service](doc/controlling-swirl-service.md)
 
 
-## Configuring Swirl Enterprise
+## Configuring SWIRL Enterprise
 - [TLS Scenarios](doc/service-setup.md#tls-scenarios)
     - [No TLS](doc/service-setup.md#no-tls)
     - [Bring Your Own Certificate (BYOC)](doc/service-setup.md#bring-your-own-certificate-byoc)
@@ -42,12 +42,12 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 - [License](doc/service-setup.md#licensing)
 - [Database](doc/service-setup.md#database)
     - [PostgreSQL](doc/service-setup.md#postgresql)
-- [Connecting Swirl to the Enterprise](doc/service-setup.md#connecting-swirl-to-the-enterprise)
+- [Connecting SWIRL to the Enterprise](doc/service-setup.md#connecting-swirl-to-the-enterprise)
     - [Connecting to Microsoft IDP](doc/service-setup.md#connecting-to-microsoft-idp)
 - [Configuring MCP Proxy (optional)](doc/mcp-proxy-setup.md)
-## Controlling and Monitoring Swirl Service
-- [Controlling Swirl Service](doc/controlling-swirl-service.md)
-    - Start, stop, and restart the Swirl service.
+## Controlling and Monitoring SWIRL Service
+- [Controlling SWIRL Service](doc/controlling-swirl-service.md)
+    - Start, stop, and restart the SWIRL service.
     - View logs and status of the service.
     - Manage service configuration.
 
@@ -57,5 +57,5 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 
 # Support
 
-For general support, please use the private Slack or Microsoft Teams channel connecting Swirl and your company.
+For general support, please use the private Slack or Microsoft Teams channel connecting SWIRL and your company.
 To report an issue please [create a ticket](https://swirlaiconnect.com/support-ticket).

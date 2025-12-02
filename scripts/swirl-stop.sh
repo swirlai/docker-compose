@@ -1,6 +1,6 @@
 #!/bin/bash
 ####
-# Stop Swirl application directly in docker AND through system services (LaunchAgent/systemd).
+# Stop SWIRL application directly in docker AND through system services (LaunchAgent/systemd).
 # This is done mainly to account for asymmetry in how DARWIN services handle docker and signals
 ####
 

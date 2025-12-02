@@ -1,6 +1,6 @@
 #!/bin/bash
 ####
-# Main installation script for Swirl application. Sets up environment, installs dependencies, and configures services.
+# Main installation script for SWIRL application. Sets up environment, installs dependencies, and configures services.
 ####
 
 set -e
@@ -37,9 +37,9 @@ source "$PARENT_DIR/scripts/swirl-shared.sh"
 
 # check for local images and pull if not found
 if "${DOCKER_BIN}" inspect "${SWIRL_PATH}:${SWIRL_VERSION}" > /dev/null 2>&1; then
-    log "Found local Swirl image ${SWIRL_PATH}:${SWIRL_VERSION}"
+    log "Found local SWIRL image ${SWIRL_PATH}:${SWIRL_VERSION}"
 else
-    log "Local Swirl image ${SWIRL_PATH}:${SWIRL_VERSION} not found. Pulling images from Docker Hub."
+    log "Local SWIRL image ${SWIRL_PATH}:${SWIRL_VERSION} not found. Pulling images from Docker Hub."
     log "Pulling for profiles: $(get_active_profiles)"
     COMPOSE_PROFILES="$(get_active_profiles)" "${DOCKER_BIN}" compose -f $PARENT_DIR/docker-compose.yml  pull --quiet
 fi
