@@ -34,21 +34,19 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 - **Docker**: v27.3.1 or later
 
 # Setup Documentation
-
 - [Downloading SWIRL Enterprise](doc/downloading-swirl-enterprise-docker-environment.md)
 - [Setting up Docker Support on Host OS](doc/docker-package-setup-ubuntu.md)
 - [Setting up the SWIRL Service](doc/service-setup.md)
 - [Controlling SWIRL Service](doc/controlling-swirl-service.md)
-
 - [TLS Scenarios](doc/service-setup.md#tls-scenarios)
-    - [No TLS](doc/service-setup.md#no-tls)
-    - [Bring Your Own Certificate (BYOC)](doc/service-setup.md#bring-your-own-certificate-byoc)
-    - [TLS Configuration with Let's Encrypt & Certbot (optional)](doc/service-setup.md#tls-configuration-with-lets-encrypt--certbot-optional)
+  - [No TLS](doc/service-setup.md#no-tls)
+  - [Bring Your Own Certificate (BYOC)](doc/service-setup.md#bring-your-own-certificate-byoc)
+  - [TLS Configuration with Let's Encrypt & Certbot (optional)](doc/service-setup.md#tls-configuration-with-lets-encrypt--certbot-optional)
 - [License](doc/service-setup.md#licensing)
 - [Database](doc/service-setup.md#database)
-    - [PostgreSQL](doc/service-setup.md#postgresql)
+  - [PostgreSQL](doc/service-setup.md#postgresql)
 - [Connecting SWIRL to the Enterprise](doc/service-setup.md#connecting-swirl-to-the-enterprise)
-    - [Connecting to Microsoft IDP](doc/service-setup.md#connecting-to-microsoft-idp)
+  - [Connecting to Microsoft IDP](doc/service-setup.md#connecting-to-microsoft-idp)
 - [Configuring MCP Proxy (optional)](doc/mcp-proxy-setup.md)
 
 # Swirl Documentation
