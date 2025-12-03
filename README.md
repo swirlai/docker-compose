@@ -37,13 +37,11 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 
 # Setup Documentation
 
-## Installation Steps (MOVE THESE)
 - [Downloading SWIRL Enterprise](doc/downloading-swirl-enterprise-docker-environment.md)
 - [Setting up Docker Support on Host OS](doc/docker-package-setup-ubuntu.md)
 - [Setting up the SWIRL Service](doc/service-setup.md)
 - [Controlling SWIRL Service](doc/controlling-swirl-service.md)
 
-## Configuring SWIRL Enterprise
 - [TLS Scenarios](doc/service-setup.md#tls-scenarios)
     - [No TLS](doc/service-setup.md#no-tls)
     - [Bring Your Own Certificate (BYOC)](doc/service-setup.md#bring-your-own-certificate-byoc)
