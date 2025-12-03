@@ -10,7 +10,7 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
     - [Minimum System Requirements](#minimum-system-requirements)
     - [Set up Instructions](doc/setup-instructions.md)
 2. [Setup Documentation](#setup-documentation)
-3. [Swirl Documentation](#swirl-documentation)
+3. [SWIRL Documentation](#swirl-documentation)
 4. [Support](#support)
 
 # Installation
@@ -30,13 +30,13 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 - **OS:** macOS 14.5 Sonoma or later
 - **Processor:** Apple silicon (M1 or later)
 - **Memory (RAM):** 8 GB minimum (16 GB recommended)
-- **Storage:** 2 GB of available disk space for installation
+- **Storage:** 100 GB of available disk space for installation
 - **Docker**: v27.3.1 or later
 
 # Setup Documentation
 - [Downloading SWIRL Enterprise](doc/downloading-swirl-enterprise-docker-environment.md)
-- [Setting up Docker Support on Host OS](doc/docker-package-setup-ubuntu.md)
-- [Setting up the SWIRL Service](doc/service-setup.md)
+- [Description of Docker Support Installation Script](doc/docker-package-setup-ubuntu.md)
+- [Details of Setting up the SWIRL Service](doc/service-setup.md)
 - [Controlling SWIRL Service](doc/controlling-swirl-service.md)
 - [TLS Scenarios](doc/service-setup.md#tls-scenarios)
   - [No TLS](doc/service-setup.md#no-tls)
