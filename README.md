@@ -25,7 +25,7 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 - **Storage:** 500 GB available space
 - **Docker**: v28 or later
 
-### (macOS)
+### macOS
 
 - **OS:** macOS 14.5 Sonoma or later
 - **Processor:** Apple silicon (M1 or later)
