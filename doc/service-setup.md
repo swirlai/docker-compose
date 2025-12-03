@@ -17,6 +17,7 @@ SWIRL runs in a Docker compose environment controlled by a service.
     - [Licensing](#licensing)
 7. [Connecting SWIRL to the Enterprise](#connecting-swirl-to-the-enterprise)
     - [Connecting to Microsoft IDP](#connecting-to-microsoft-idp)
+    - [Connecting to Google IDP](#connecting-to-google-idp)
 
 ## Prerequisites
 - Docker Compose installed on the host system. (see [Setting Up Docker Support on Host OS](../doc/docker-package-setup-ubuntu.md))
@@ -148,21 +149,46 @@ Copy & paste this into the file exactly as it is. SWIRL Enterprise will not oper
 # Connecting SWIRL to the Enterprise
 
 ## Connecting to Microsoft IDP
+1. Create an App Registration according to [these instructions](https://docs.swirlaiconnect.com/M365-Guide.html).
 
-If you will be using Microsoft as your IDP, you need to complete the following configuration steps:
+2. Configure and activate the [Microsoft Authenticator in SWIRL](https://docs.swirlaiconnect.com/M365-Guide.html#configure-the-microsoft-authenticator).
 
-1. [Create a App Registration in your Microsoft Tenant. Note the Client Id, the tenant ID, and the Client Secrete](https://docs.swirlaiconnect.com/M365-Guide.html)
-2. [Start SWIRL and update the Microsoft Authentication Provider, filling in the Client and and Secrete](https://docs.swirlaiconnect.com/M365-Guide.html)
-3. Configure the following environment variables in the `.env` file:
+3. Edit the following `.env` file entries to included the Microsoft client and tenant IDs:
 
-| Environment Variable | Description |
-|----------------------|-------------|
-| MS_AUTH_CLIENT_ID | Client ID for Microsoft Entra ID application registration. |
-| MS_TENANT_ID | Tenant ID for Microsoft Entra ID application registration. |
-
-Example configuration for Microsoft Application Registration:
-
-```env
+```sh
+# Uncomment and set the following to use Microsoft authentication.
 MS_AUTH_CLIENT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 MS_TENANT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 ```
+
+4. Ensure that the `PROTOCOL` and `SWIRL_PORT` values in the `.env` file are set to match the SWIRL homepage URL. For example,
+
+When accessing SWIRL on a local machine:
+```sh
+PROTOCOL="http"
+SWIRL_PORT="8000"
+```
+
+When accessing SWIRL through `https` and standard ports:
+```sh
+PROTOCOL="https"
+SWIRL_PORT=""
+```
+
+5. Restart the SWIRL service.
+
+## Connecting to Google IDP
+1. Create an App Registration according to [these instructions](https://docs.swirlaiconnect.com/GoogleWorkspace-Guide.html).
+
+2. Configure and activate the [Google Authenticator in SWIRL](https://docs.swirlaiconnect.com/GoogleWorkspace-Guide.html#configure-the-google-authenticator).
+
+3. Edit the following `.env` file entry to include the unique portion of the Google client ID only:
+
+```sh
+# Uncomment and set the following to use Google authentication.
+GOOGLE_AUTH_CLIENT_ID="xxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxx"
+```
+
+*NOTE: Do not include the `.apps.googleusercontent.com` in this entry.  Instead, add only the unique ID value that appears before that in the app registration.*
+
+4. Restart the SWIRL service.

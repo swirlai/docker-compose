@@ -5,7 +5,7 @@ using that standard service management interface.
 
 
 ## Starting/Stopping SWIRL Service
-To start or stop the Swirl service, you can use the following commands:
+To start or stop the SWIRL service, you can use the following commands:
 
 ### Linux
 ```bash

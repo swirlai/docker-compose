@@ -12,7 +12,7 @@ PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 
 DOCKER_BIN="$(command -v docker)"
 
-echo "[swirl-stop] Stopping Swirl Docker stack..."
+echo "[swirl-stop] Stopping SWIRL Docker stack..."
 "$DOCKER_BIN" compose -f "$PARENT_DIR/docker-compose.yml" --profile all stop || true
 
 if [[ "$OSTYPE" == "darwin"* ]]; then

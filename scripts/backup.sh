@@ -133,5 +133,5 @@ backup_files
 package_archive
 cleanup
 
-# Restart Swirl service
+# Restart SWIRL service
 systemctl start swirl
