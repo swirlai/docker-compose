@@ -10,7 +10,7 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
     - [Minimum System Requirements](#minimum-system-requirements)
     - [Set up Instructions](doc/setup-instructions.md)
 2. [Setup Documentation](#setup-documentation)
-3. [Script Documentation](link-TBD)
+3. [Script Documentation](doc/script-documentation.md)
 4. [SWIRL Documentation](#swirl-documentation)
 5. [Support](#support)
 
