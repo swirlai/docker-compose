@@ -8,31 +8,40 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 # Table of Contents
 1. [Installation](#installation)
     - [Minimum System Requirements](#minimum-system-requirements)
-    - [Installation Steps](#installation-steps)
+    - [Set up Instructions](doc/setup-instructions.md)
     - [Configuring Swirl Enterprise](#configuring-swirl-enterprise)
     - [Controlling and Monitoring Swirl Service](#controlling-and-monitoring-swirl-service)
-2. [Additional Documentation](#additional-documentation)
-3. [Support](#support)
+2. [Setup Documentation](#setup-documentation)
+3. [Swirl Documentation](#swirl-documentation)
+4. [Support](#support)
 
 # Installation
 
 ## Minimum System Requirements
 
-* **OS:** Linux platform (Ubuntu, RHEL)
-* **Processor:** +8 VCPU
-* **Memory:** +16 GB RAM
-* **Storage:** 500 GB available space
-* **Docker**: v28 or later
+### Linux
 
-TODO : Add Mac
+- **OS:** Linux platform (Ubuntu, RHEL)
+- **Processor:** +8 VCPU
+- **Memory:** +16 GB RAM
+- **Storage:** 500 GB available space
+- **Docker**: v28 or later
 
-## Installation Steps
-- [Set up Instructions](doc/setup-instructions.md)
+### (macOS)
+
+- **OS:** macOS 14.5 Sonoma or later
+- **Processor:** Apple silicon (M1 or later)
+- **Memory (RAM):** 8 GB minimum (16 GB recommended)
+- **Storage:** 2 GB of available disk space for installation
+- **Docker**: v27.3.1 or later
+
+# Setup Documentation
+
+## Installation Steps (MOVE THESE)
 - [Downloading SWIRL Enterprise](doc/downloading-swirl-enterprise-docker-environment.md)
 - [Setting up Docker Support on Host OS](doc/docker-package-setup-ubuntu.md)
 - [Setting up the SWIRL Service](doc/service-setup.md)
 - [Controlling SWIRL Service](doc/controlling-swirl-service.md)
-
 
 ## Configuring SWIRL Enterprise
 - [TLS Scenarios](doc/service-setup.md#tls-scenarios)
@@ -45,13 +54,8 @@ TODO : Add Mac
 - [Connecting SWIRL to the Enterprise](doc/service-setup.md#connecting-swirl-to-the-enterprise)
     - [Connecting to Microsoft IDP](doc/service-setup.md#connecting-to-microsoft-idp)
 - [Configuring MCP Proxy (optional)](doc/mcp-proxy-setup.md)
-## Controlling and Monitoring SWIRL Service
-- [Controlling SWIRL Service](doc/controlling-swirl-service.md)
-    - Start, stop, and restart the SWIRL service.
-    - View logs and status of the service.
-    - Manage service configuration.
 
-# Additional Documentation
+# Swirl Documentation
 
 [Overview](https://docs.swirlaiconnect.com/) | [Quick Start](https://docs.swirlaiconnect.com/Quick-Start) | [User Guide](https://docs.swirlaiconnect.com/User-Guide) | [Admin Guide](https://docs.swirlaiconnect.com/Admin-Guide) | [M365 Guide](https://docs.swirlaiconnect.com/M365-Guide) | [Developer Guide](https://docs.swirlaiconnect.com/Developer-Guide) | [Developer Reference](https://docs.swirlaiconnect.com/Developer-Reference) | [AI Search Guide](https://docs.swirlaiconnect.com/AI-Search.html) | [AI Search Assistant Guide](https://docs.swirlaiconnect.com/AI-Search-Assistant.html)
 
