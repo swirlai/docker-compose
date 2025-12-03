@@ -1,12 +1,12 @@
 # Overview
 At present, our recommended Linux distribution for this solution is the
-most recent long-term support release of Ubuntu ([24.04 LTS](https://releases.ubuntu.com/noble/)). 
+most recent long-term support release of Ubuntu ([24.04 LTS](https://releases.ubuntu.com/noble/)).
 
 
 # Ubuntu 24.04 LTS
 
-This [ubuntu24_04.sh](../setup/ubuntu24_04.sh) script automates the setup 
-of the official Docker repository and installs Docker-related tools on an 
+This [install.sh](../scripts/install.sh) script automates the setup
+of the official Docker repository and installs Docker-related tools on an
 Ubuntu 24.04 system. Below is a step-by-step explanation of the script:
 
 ## Install Prerequisites
@@ -78,4 +78,3 @@ For MacOS, the recommended approach is to use [Docker Desktop](https://www.docke
 user-friendly interface for managing Docker containers and includes Docker Compose support out of the box.
 
 **Note**: MacOS is defined for development and testing purposes and is not recommended for production use.
-

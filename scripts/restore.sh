@@ -131,7 +131,7 @@ info "  WORKING_DIR: $WORKING_DIR"
 
 
 trap 'cleanup' ERR
-# stop Swirl to get a consistent backup
+# stop SWIRL to get a consistent backup
 # and to prevent auto restart of containers
 systemctl stop swirl
 check_environment

@@ -123,7 +123,7 @@ info "  TAR_FILE: $TAR_FILE"
 
 trap 'cleanup' ERR
 
-# stop Swirl to get a consistent backup
+# stop SWIRL to get a consistent backup
 # and to prevent auto restart of containers
 systemctl stop swirl
 
@@ -133,5 +133,5 @@ backup_files
 package_archive
 cleanup
 
-# Restart Swirl service
+# Restart SWIRL service
 systemctl start swirl

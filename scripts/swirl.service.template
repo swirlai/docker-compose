@@ -1,5 +1,5 @@
 [Unit]
-Description=Swirl AI Connect
+Description=SWIRL AI Connect
 After=network.target
 
 [Service]
