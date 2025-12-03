@@ -1,9 +1,6 @@
 # Setup Instructions
 
-This document explains how to configure and deploy SWIRL by providing:
-
-- A **Setup Instructions** section to guide you through preparing your environment
-- A **complete table of all SWIRL configuration settings**, including defaults and notes (all values marked `CHANGE ME` should be reviewed and may require customization)
+This document explains how to configure and deploy SWIRL in your environment using docker-compose.
 
 ---
 
@@ -30,19 +27,18 @@ cd swirl-enterprise-compose
 
 ### 3. Create Your Environment File
 
-Copy the example environment file:
+Copy the example environment file and create a new `.env` file:
 
 ```sh
 cp env.example .env
 ```
 
-Then **edit `.env`** to match your desired configuration. [Use the Configuration Table for guidance](#-general-settings)
+Then **edit `.env`** to match your desired configuration.
 
-Important notes:
-
-* If **USE_TLS=true** and **USE_NGINX=true**, ensure ports **80** and **443** are open.
-* Add DNS entries for the **fully qualified domain name (FQDN)** you will use for accessing SWIRL.
-
+**Important Notes:**
+* A valid SWIRL license key is required and must be added to the `.env` file.
+* If you set **USE_TLS=true** and **USE_NGINX=true** in the `.env` file, ensure that ports **80** and **443** are both open.
+* You must add DNS entries for the **fully qualified domain name (FQDN)** you will use for accessing SWIRL.
 
 ---
 
@@ -52,16 +48,15 @@ Run the install script:
 
 ```sh
 sudo ./scripts/install.sh
-````
+```
 
 ---
-
 
 ### 5. Authenticate to Docker Hub
 
 Create a [Docker Hub Personal Access Token (PAT)](./create-dockerhub-pat.md) for your Docker Hub user.
 
-Then log in using it with this script:
+Then, run this script to log in using the new PAT:
 
 ```sh
 sudo ./scripts/docker-login.sh
@@ -69,7 +64,7 @@ sudo ./scripts/docker-login.sh
 
 ---
 
-### 6. Install Docker images
+### 6. Install the SWIRL Docker images
 
 
 ```sh
@@ -128,7 +123,7 @@ Stop SWIRL using:
 ./scripts/stop-swirl.sh
 ```
 
-SWIRL should now be running and accessible at the configured domain.  Look for a log entry similar to this indicating the service is available:
+SWIRL should now be running and accessible at the configured domain.  Look for a log entry similar to this one indicating the service is available:
 
 ```
 swirl_app | INFO 2025-12-02 14:33:41 server Listening on TCP address 0.0.0.0:8000
@@ -136,9 +131,11 @@ swirl_app | INFO 2025-12-02 14:33:41 server Listening on TCP address 0.0.0.0:800
 
 ---
 
-### Configure OIDC with Microsoft as th IDP (Optional)
+### Configure OIDC with Microsoft as the IDP (Optional)
 1. Create an App Registration according to [these instructions](https://docs.swirlaiconnect.com/M365-Guide.html).
+
 2. Configure and activate the [Microsoft Authenticator in SWIRL](https://docs.swirlaiconnect.com/M365-Guide.html#configure-the-microsoft-authenticator).
+
 3. Edit the following `.env` file entries to included the Microsoft client and tenant IDs:
 
 ```sh
@@ -146,7 +143,8 @@ swirl_app | INFO 2025-12-02 14:33:41 server Listening on TCP address 0.0.0.0:800
 MS_AUTH_CLIENT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 MS_TENANT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 ```
-4. Ensure that the `PROTOCOL` and `SWIRL_PORT` values in `.env` are set to match the SWIRL homepage URL. For example,
+
+4. Ensure that the `PROTOCOL` and `SWIRL_PORT` values in the `.env` file are set to match the SWIRL homepage URL. For example,
 
 When accessing SWIRL on a local machine:
 ```sh
@@ -164,9 +162,11 @@ SWIRL_PORT=""
 
 ---
 
-### Configure OIDC with Google as th IDP (Optional)
+### Configure OIDC with Google as the IDP (Optional)
 1. Create an App Registration according to [these instructions](https://docs.swirlaiconnect.com/GoogleWorkspace-Guide.html).
+
 2. Configure and activate the [Google Authenticator in SWIRL](https://docs.swirlaiconnect.com/GoogleWorkspace-Guide.html#configure-the-google-authenticator).
+
 3. Edit the following `.env` file entry to include the unique portion of the Google client ID only:
 
 ```sh
