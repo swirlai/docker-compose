@@ -24,7 +24,7 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 * **Storage:** 500 GB available space
 * **Docker**: v28 or later
 
-> **Note:** SWIRL does support use of a proxy server between SWIRL and target systems. Refer to section TBD for more information.
+TODO : Add Mac
 
 ## Installation Steps
 - [Set up Instructions](doc/setup-instructions.md)
