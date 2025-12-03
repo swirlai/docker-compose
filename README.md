@@ -1,6 +1,6 @@
-![Swirl](https://docs.swirl.today/images/transparent_header_3.png)
+![SWIRL](https://docs.swirl.today/images/transparent_header_3.png)
 
-# Swirl Enterprise Edition
+# SWIRL Enterprise Edition
 
 **Notice:** this repository is commercially licensed. A valid license key is required for use.
 Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for more information.
@@ -10,8 +10,9 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
     - [Minimum System Requirements](#minimum-system-requirements)
     - [Set up Instructions](doc/setup-instructions.md)
 2. [Setup Documentation](#setup-documentation)
-3. [SWIRL Documentation](#swirl-documentation)
-4. [Support](#support)
+3. [Script Documentation](link-TBD)
+4. [SWIRL Documentation](#swirl-documentation)
+5. [Support](#support)
 
 # Installation
 
@@ -25,10 +26,10 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 - **Storage:** 500 GB available space
 - **Docker**: v28 or later
 
-### macOS
+### MacOS
 
-- **OS:** macOS 14.5 Sonoma or later
-- **Processor:** Apple silicon (M1 or later)
+- **OS:** MacOS 14.5 Sonoma or later
+- **Processor:** Apple Silicon (M1 or later)
 - **Memory (RAM):** 8 GB minimum (16 GB recommended)
 - **Storage:** 100 GB of available disk space for installation
 - **Docker**: v27.3.1 or later
@@ -49,7 +50,10 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
   - [Connecting to Microsoft IDP](doc/service-setup.md#connecting-to-microsoft-idp)
 - [Configuring MCP Proxy (optional)](doc/mcp-proxy-setup.md)
 
-# Swirl Documentation
+# Script Documentation
+TBD
+
+# SWIRL Documentation
 
 [Overview](https://docs.swirlaiconnect.com/) | [Quick Start](https://docs.swirlaiconnect.com/Quick-Start) | [User Guide](https://docs.swirlaiconnect.com/User-Guide) | [Admin Guide](https://docs.swirlaiconnect.com/Admin-Guide) | [M365 Guide](https://docs.swirlaiconnect.com/M365-Guide) | [Developer Guide](https://docs.swirlaiconnect.com/Developer-Guide) | [Developer Reference](https://docs.swirlaiconnect.com/Developer-Reference) | [AI Search Guide](https://docs.swirlaiconnect.com/AI-Search.html) | [AI Search Assistant Guide](https://docs.swirlaiconnect.com/AI-Search-Assistant.html)
 
