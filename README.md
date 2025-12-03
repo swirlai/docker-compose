@@ -9,8 +9,6 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 1. [Installation](#installation)
     - [Minimum System Requirements](#minimum-system-requirements)
     - [Set up Instructions](doc/setup-instructions.md)
-    - [Configuring Swirl Enterprise](#configuring-swirl-enterprise)
-    - [Controlling and Monitoring Swirl Service](#controlling-and-monitoring-swirl-service)
 2. [Setup Documentation](#setup-documentation)
 3. [Swirl Documentation](#swirl-documentation)
 4. [Support](#support)
