@@ -35,13 +35,17 @@ log "Loading env file $ENV_FILE and sourcing shared functions..."
 source "$ENV_FILE"
 source "$PARENT_DIR/scripts/swirl-shared.sh"
 
-# check for local images and pull if not found
+# Check for local SWIRL image (for diagnostics only)
 if "${DOCKER_BIN}" inspect "${SWIRL_PATH}:${SWIRL_VERSION}" > /dev/null 2>&1; then
     log "Found local SWIRL image ${SWIRL_PATH}:${SWIRL_VERSION}"
 else
-    log "Local SWIRL image ${SWIRL_PATH}:${SWIRL_VERSION} not found. Pulling images from Docker Hub."
-    log "Pulling for profiles: $(get_active_profiles)"
-    COMPOSE_PROFILES="$(get_active_profiles)" "${DOCKER_BIN}" compose -f $PARENT_DIR/docker-compose.yml  pull --quiet
+    log "Local SWIRL image ${SWIRL_PATH}:${SWIRL_VERSION} not found locally."
 fi
 
-log "Docker image Installation completed."
+ACTIVE_PROFILES="$(get_active_profiles)"
+log "Pulling images from Docker Hub for profiles: ${ACTIVE_PROFILES:-<none>}"
+
+COMPOSE_PROFILES="${ACTIVE_PROFILES}" \
+    "${DOCKER_BIN}" compose -f "$PARENT_DIR/docker-compose.yml" pull --quiet
+
+log "Docker image installation completed."
