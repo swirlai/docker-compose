@@ -174,12 +174,12 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     else
         log "swirl.service already exists in /etc/systemd/system/"
     fi
-    sudo systemctl enable SWIRL
+    sudo systemctl enable swirl
 
     log "Login to docker with sudo scripts/docker-login.sh"
     log "Install docker images with sudo scripts/install-docker-images.sh and you can start and monitor the service."
-    log "Start Service via: systemctl start SWIRL"
-    log "Monitor Service via: journalctl -u SWIRL"
+    log "Start Service via: systemctl start swirl"
+    log "Monitor Service via: journalctl -u swirl"
 
 else
     error "Unsupported OS: $OSTYPE"

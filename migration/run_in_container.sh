@@ -25,7 +25,7 @@ echo $PROG "Running migration phase '$PHASE' in container using image '$IMAGE_TA
 
 sudo docker run --rm \
 --network "$NETWORK" \
--v /app/migration:/app/migration \
--v /app/.env:/app/migration/.env.host \
+-v ./migration:/app/migration \
+-v ./.env:/app/migration/.env.host \
 "$IMAGE_TAG" \
 bash -lc 'set -a; source /app/migration/.env.host; set +a; cd /app && ./migration/'"${PHASE}"'.sh'
