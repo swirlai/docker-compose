@@ -29,7 +29,7 @@ fi
 
 TIMESTAMP="$(date +%Y-%m-%d-%H%M%S)"
 BUNDLE_NAME="migration_bundle_${FROM}_to_${TO}_${TIMESTAMP}.tar.gz"
-BUNDLE_PATH="./${BUNDLE_NAME}"   # <-- NOTE: bundle lives in /app now
+BUNDLE_PATH="./${BUNDLE_NAME}"   # bundle lives in /app
 
 log "Creating migration bundle: ${BUNDLE_PATH}"
 
@@ -38,8 +38,9 @@ if [[ ! -f "${MIGRATION_DIR}/extract.json" ]]; then
     log "WARNING: ${MIGRATION_DIR}/extract.json not found – did extract run?"
 fi
 
-# Archive the *contents* of migration/ into a tarball in /app
-tar czf "${BUNDLE_PATH}" -C "${MIGRATION_DIR}" .
+# Archive the migration directory itself into a tarball in /app
+# This will create a bundle that, when extracted, contains a top-level "migration/" directory.
+tar czf "${BUNDLE_PATH}" migration
 
 log "Migration bundle created: ${BUNDLE_PATH}"
 log "You can now copy this single file to the new VM (e.g. scp ${BUNDLE_NAME})."
