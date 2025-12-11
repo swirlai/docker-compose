@@ -10,12 +10,10 @@ from django.core.exceptions import ValidationError
 # Django setup
 # -------------------------------------------------------------------
 # FIXME: update this to your actual settings module
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "your_project.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "swirl_server.settings")
 django.setup()
 
-# FIXME: update imports to your real model locations
-from yourapp.models import Authenticator, SearchProvider, AIProvider  # type: ignore
-
+from swirl.models import AIProvider, Authenticator, SearchProvider
 
 # -------------------------------------------------------------------
 # Config
@@ -29,6 +27,28 @@ SENSITIVE_FIELDS = {
     "Authenticator": {"client_secret", "password", "secret_key", "api_key", "token"},
     "SearchProvider": {"api_key", "password", "token", "secret_key"},
     "AIProvider": {"api_key", "secret_key", "password", "token"},
+}
+
+# Fields that will be assigned during load, not translate,
+# so we skip validating them here.
+VALIDATION_EXCLUDE_FIELDS = {
+    "SearchProvider": {"owner"},
+    "Authenticator": {"owner"},
+    "AIProvider": {"owner"}
+}
+
+# Explicit per-model field defaults for cases where:
+# - we do NOT want to migrate the old value (e.g. secrets)
+# - there is no model-level default
+# - null=True but we prefer a placeholder string
+EXPLICIT_FIELD_DEFAULTS = {
+    "Authenticator": {
+        "client_secret": "<client-secret>",
+        # add more as needed
+    },
+    "AIProvider": {
+        "defaults": [""],
+     },
 }
 
 
@@ -59,29 +79,75 @@ def concrete_fields_for_model(model_cls):
 def build_field_value(model_name: str, field, src_dict: dict):
     """
     Decide what value to assign to a field:
-      - if present in src_dict and not sensitive: use that value
+      - if present in src_dict and not sensitive:
+          - if non-blank → use that value
+          - if blank and explicit default exists → use explicit default
+      - if sensitive:
+          - if explicit default is configured: use placeholder default
+          - else: skip field entirely (do not set in result)
+      - else if explicit default exists: use that
       - else if field has default: use default
       - else if field.null: use None
+      - else if auto_now/auto_now_add: skip (let model fill it)
       - else: raise, because we cannot guess a valid value
     """
     name = field.name
     sensitive = SENSITIVE_FIELDS.get(model_name, set())
+    explicit_defaults = EXPLICIT_FIELD_DEFAULTS.get(model_name, {})
 
-    # Skip sensitive fields entirely (we never migrate secrets)
+    # Sensitive fields: never copy the old value
     if name in sensitive:
-        log(f"{model_name}.{name}: skipping sensitive field")
-        return None, True  # value=None, skipped=True (won't be set in result)
+        if name in explicit_defaults:
+            value = explicit_defaults[name]
+            log(
+                f"{model_name}.{name}: sensitive field, using explicit placeholder "
+                f"default: {value!r}"
+            )
+            return value, False  # set this value in result
+        else:
+            log(f"{model_name}.{name}: sensitive field, skipping (no explicit default)")
+            return None, True  # skipped=True → caller omits from result
 
+    # Non-sensitive: use source value if present
     if name in src_dict:
-        # Use the value as extracted (it already came from the old DB)
-        return src_dict[name], False
+        raw_value = src_dict[name]
 
-    # Not in src: fall back to defaults / null rules
+        # Consider "blank" source values as missing if we have an explicit default
+        is_blank = (
+            raw_value is None
+            or raw_value == ""
+            or raw_value == []
+            or raw_value == {}
+            or (isinstance(raw_value, str) and raw_value.strip() == "")
+        )
+
+        if is_blank and name in explicit_defaults:
+            value = explicit_defaults[name]
+            log(
+                f"{model_name}.{name}: source value is blank; "
+                f"using explicit default {value!r}"
+            )
+            return value, False
+
+        # Otherwise, use the value as-is
+        return raw_value, False
+
+    # Non-sensitive: explicit default in our mapping
+    if name in explicit_defaults:
+        value = explicit_defaults[name]
+        log(f"{model_name}.{name}: using explicit default: {value!r}")
+        return value, False
+
+    # Auto timestamp / auto-managed fields: let the model handle them at save time
+    if getattr(field, "auto_now", False) or getattr(field, "auto_now_add", False):
+        log(f"{model_name}.{name}: auto_now/auto_now_add field, skipping")
+        return None, True  # skipped → not included in result
+
+    # Not in src: fall back to model defaults / null rules
     if field.has_default():
         try:
             value = field.get_default()
         except TypeError:
-            # Very old Django versions may not have get_default(); fall back
             value = field.default() if callable(field.default) else field.default
         return value, False
 
@@ -91,7 +157,8 @@ def build_field_value(model_name: str, field, src_dict: dict):
     # Required, non-null, no default, and missing in source data
     raise RuntimeError(
         f"{model_name}.{name} is required, has no default, "
-        f"and is missing from extract.json. "
+        f"and is missing from extract.json and EXPLICIT_FIELD_DEFAULTS, "
+        "and is not an auto-managed field. "
         "You may need to handle this field explicitly in translate.py."
     )
 
@@ -126,14 +193,16 @@ def translate_record(model_cls, src_dict: dict) -> dict:
 
     return result
 
-
 def translate_and_validate(model_cls, records, kind_label: str):
     """
     Translate a list of source dicts into a list of validated dicts for model_cls.
     For each record:
       - build a translated dict
       - instantiate model_cls(**data)
-      - run full_clean()
+      - run full_clean() with:
+          * validate_unique=False
+          * validate_constraints=False
+          * exclude = fields we intentionally set at load time
     """
     model_name = model_cls.__name__
     output = []
@@ -144,13 +213,29 @@ def translate_and_validate(model_cls, records, kind_label: str):
 
         data = translate_record(model_cls, src)
 
-        # Instantiate unsaved instance for validation
         instance = model_cls(**data)
+
+        # Figure out which fields to skip during validation
+        exclude_fields = list(VALIDATION_EXCLUDE_FIELDS.get(model_name, set()))
+
         try:
-            instance.full_clean()
+            try:
+                # Newer Django supports validate_constraints
+                instance.full_clean(
+                    validate_unique=False,
+                    validate_constraints=False,
+                    exclude=exclude_fields,
+                )
+            except TypeError:
+                # Older Django: no validate_constraints
+                instance.full_clean(
+                    validate_unique=False,
+                    exclude=exclude_fields,
+                )
         except ValidationError as ve:
             log(
-                f"ValidationError for {model_name} '{name}': {ve.message_dict if hasattr(ve, 'message_dict') else ve}"
+                f"ValidationError for {model_name} '{name}': "
+                f"{getattr(ve, 'message_dict', ve)}"
             )
             raise
 
@@ -183,9 +268,12 @@ def main():
         f"{len(src_ais)} AI providers from extract.json"
     )
 
-    dst_auths = translate_and_validate(Authenticator, src_auths, "authenticator")
-    dst_sps = translate_and_validate(SearchProvider, src_sps, "search provider")
-    dst_ais = translate_and_validate(AIProvider, src_ais, "AI provider")
+    dst_auths = translate_and_validate(Authenticator, src_auths,
+                                       "authenticator")
+    dst_sps = translate_and_validate(SearchProvider, src_sps,
+                                     "search provider")
+    dst_ais = translate_and_validate(AIProvider, src_ais,
+                                     "AI provider")
 
     dst = {
         "authenticators": dst_auths,

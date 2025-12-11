@@ -3,7 +3,7 @@ import os
 
 import django
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "your_project.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "swirl_server.settings")
 django.setup()
 
 from swirl.models import AIProvider, Authenticator, SearchProvider

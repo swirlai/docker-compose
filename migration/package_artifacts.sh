@@ -20,7 +20,7 @@ if [[ -z "${FROM}" || -z "${TO}" ]]; then
 fi
 
 # Assume script is run from /app
-cd /app
+# cd /app
 
 MIGRATION_DIR="./migration"
 if [[ ! -d "${MIGRATION_DIR}" ]]; then
