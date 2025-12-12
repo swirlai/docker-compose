@@ -1,9 +1,14 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
+
 PROG="$(basename "$0")"
 
-echo $PROG "Starting data load process"
+log() {
+    echo "[$PROG] $1"
+}
 
-echo $PROG "Starting data model object load..."
-PYTHONPATH=. python ./migration/load.py
-echo $PROG "Completed data model object load."
+log "Starting load process"
+
+PYTHONPATH=. python ./migration/load.py "$@"
+
+log "Completed load process"

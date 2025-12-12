@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import argparse
 import json
 import os
 import sys
@@ -9,7 +10,6 @@ from django.core.exceptions import ValidationError
 # -------------------------------------------------------------------
 # Django setup
 # -------------------------------------------------------------------
-# FIXME: update this to your actual settings module
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "swirl_server.settings")
 django.setup()
 
@@ -34,7 +34,7 @@ SENSITIVE_FIELDS = {
 VALIDATION_EXCLUDE_FIELDS = {
     "SearchProvider": {"owner"},
     "Authenticator": {"owner"},
-    "AIProvider": {"owner"}
+    "AIProvider": {"owner"},
 }
 
 # Explicit per-model field defaults for cases where:
@@ -48,7 +48,7 @@ EXPLICIT_FIELD_DEFAULTS = {
     },
     "AIProvider": {
         "defaults": [""],
-     },
+    },
 }
 
 
@@ -186,12 +186,13 @@ def translate_record(model_cls, src_dict: dict) -> dict:
             raise
 
         if skipped:
-            # Sensitive field: don't put it in the result at all
+            # Sensitive or auto-managed field: don't put it in the result at all
             continue
 
         result[field.name] = value
 
     return result
+
 
 def translate_and_validate(model_cls, records, kind_label: str):
     """
@@ -245,12 +246,37 @@ def translate_and_validate(model_cls, records, kind_label: str):
 
 
 # -------------------------------------------------------------------
-# Main
+# CLI / Main
 # -------------------------------------------------------------------
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description=(
+            "Translate extract.json from an older Swirl deployment into "
+            "load.json compatible with the current model schema."
+        )
+    )
+    parser.add_argument(
+        "-i",
+        "--input",
+        dest="input_path",
+        default="/app/migration/extract.json",
+        help="Path to input extract JSON (default: /app/migration/extract.json)",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        dest="output_path",
+        default="/app/migration/load.json",
+        help="Path to output load JSON (default: /app/migration/load.json)",
+    )
+    return parser.parse_args()
+
+
 def main():
-    src_path = "./migration/extract.json"
-    dst_path = "./migration/load.json"
+    args = parse_args()
+    src_path = args.input_path
+    dst_path = args.output_path
 
     if not os.path.exists(src_path):
         raise SystemExit(f"Source file not found: {src_path}")
@@ -265,15 +291,12 @@ def main():
     log(
         f"Loaded {len(src_auths)} authenticators, "
         f"{len(src_sps)} search providers, "
-        f"{len(src_ais)} AI providers from extract.json"
+        f"{len(src_ais)} AI providers from {src_path}"
     )
 
-    dst_auths = translate_and_validate(Authenticator, src_auths,
-                                       "authenticator")
-    dst_sps = translate_and_validate(SearchProvider, src_sps,
-                                     "search provider")
-    dst_ais = translate_and_validate(AIProvider, src_ais,
-                                     "AI provider")
+    dst_auths = translate_and_validate(Authenticator, src_auths, "authenticator")
+    dst_sps = translate_and_validate(SearchProvider, src_sps, "search provider")
+    dst_ais = translate_and_validate(AIProvider, src_ais, "AI provider")
 
     dst = {
         "authenticators": dst_auths,
@@ -281,6 +304,7 @@ def main():
         "ai_providers": dst_ais,
     }
 
+    os.makedirs(os.path.dirname(dst_path), exist_ok=True)
     with open(dst_path, "w") as f:
         json.dump(dst, f, indent=2)
 
