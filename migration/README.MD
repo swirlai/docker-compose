@@ -172,6 +172,22 @@ migration/
 
 Copy the bundle to the new VM:
 
+### Example run
+```
+On the source host machine:
+  cd /app
+  sudo ./migration/run_in_container.sh swirlai/swirl-search-internal:v4_0_0_0 extract app_swirl authenticators search_providers -n Microsoft
+  sudo ./migration/package_artifacts.sh v4_0_0_0 v4_4_0_0
+  sudo  mv migration_bundle_v4_0_0_0_to_v4_4_0_0_2025-12-12-160114.tar.gz  ~
+
+On the target host machine:
+  cd /app
+  cp ~/home/migration_bundle_v4_0_0_0_to_v4_4_0_0_2025-12-12-160114.tar.gz .
+  gzip -cd migration_bundle_v4_0_0_0_to_v4_4_0_0_2025-12-12-160114.tar.gz | tar -tf -
+  sudo ./migration/run_in_container.sh swirlai/swirl-search-internal:develop translate swirl_network
+  sudo  ./migration/run_in_container.sh swirlai/swirl-search-internal:develop load swirl_network
+```
+
 ```
 scp migration_bundle_v4_0_0_0_to_v4_4_0_0_2025-12-12-153000.tar.gz user@newvm:/app/
 ```
