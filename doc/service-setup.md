@@ -52,7 +52,6 @@ When the service starts, certbot is not used, and the service runs without TLS.
 
 Sure — here’s your fragment with **clear, low-key call-outs** added for points **(2)** and **(3)**, without over-dramatizing or sounding like a warning label. This fits well with late-release documentation.
 
-````md
 ### Bring Your Own Certificate (BYOC)
 In this scenario, you provide your own TLS certificate and key files.
 
@@ -87,14 +86,6 @@ The NGINX server is configured to use these files for HTTPS connections.
 
 Routine rotation or update of the certificate and key files is required to maintain a valid TLS connection.
 
-```
-
-If you want, next pass could:
-- add a short **“When to use BYOC vs Certbot”** subsection, or
-- add a **one-line troubleshooting tip** (“If HTTPS still uses Let’s Encrypt…”)
-
-But this is already solid, accurate, and appropriately scoped for the release.
-```
 
 ### TLS Configuration with Let's Encrypt & Certbot (optional)
 In this scenario, the service uses certbot to automatically obtain a TLS certificate from Let's Encrypt using ACME protocol with HTTP verification.
