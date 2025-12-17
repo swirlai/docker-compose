@@ -14,6 +14,15 @@ from django.db import transaction
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "swirl_server.settings")
 django.setup()
 
+# NOTE:
+# This script runs as server-side code with direct access to Django’s ORM and
+# database. It does not perform an application-level login or create a session.
+# `get_admin_user()` simply queries the User table and returns a model instance.
+# Assigning `owner = admin_user` sets the corresponding foreign key in the DB.
+# The authority for this operation comes from the DB credentials in SQL_*,
+# not from Django authentication or permissions.
+
+
 from swirl.models import AIProvider, Authenticator, SearchProvider  # type: ignore
 
 
