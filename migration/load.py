@@ -72,8 +72,8 @@ def parse_args():
         "-i",
         "--input",
         dest="load_path",
-        default="/app/migration/load.json",
-        help="Path to load JSON file (default: /app/migration/load.json)",
+        default="./migration/load.json",
+        help="Path to load JSON file (default: ./migration/load.json)",
     )
     parser.add_argument(
         "-d",

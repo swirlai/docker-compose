@@ -101,7 +101,7 @@ def export_queryset(qs, name_regex=None):
 def parse_args():
     parser = argparse.ArgumentParser(
         description=(
-            "Extract selected Swirl objects into /app/migration/extract.json.\n\n"
+            "Extract selected Swirl objects into ./migration/extract.json.\n\n"
             "You must either specify -a/--all or one or more object types:\n"
             "  authenticators, search_providers, ai_providers"
         )
@@ -195,7 +195,7 @@ def main():
 
     base_filename = f"extract_{type_part}{name_part}.json"
 
-    migration_dir = "/app/migration"
+    migration_dir = "./migration"
     os.makedirs(migration_dir, exist_ok=True)
 
     descriptive_path = os.path.join(migration_dir, base_filename)

@@ -260,15 +260,15 @@ def parse_args():
         "-i",
         "--input",
         dest="input_path",
-        default="/app/migration/extract.json",
-        help="Path to input extract JSON (default: /app/migration/extract.json)",
+        default="./migration/extract.json",
+        help="Path to input extract JSON (default: ./migration/extract.json)",
     )
     parser.add_argument(
         "-o",
         "--output",
         dest="output_path",
-        default="/app/migration/load.json",
-        help="Path to output load JSON (default: /app/migration/load.json)",
+        default="./migration/load.json",
+        help="Path to output load JSON (default: ./migration/load.json)",
     )
     return parser.parse_args()
 
