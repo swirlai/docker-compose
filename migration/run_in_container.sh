@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 PROG="$(basename "$0")"
@@ -24,11 +23,24 @@ case "$PHASE" in
     ;;
 esac
 
+LOG_DIR="./migration/logs"
+mkdir -p "$LOG_DIR"
+LOG_FILE="${LOG_DIR}/run_in_container.log"
+
+timestamp() { date +"%Y-%m-%d %H:%M:%S"; }
+
+{
+  echo "=================================================================="
+  echo "[$(timestamp)] phase=$PHASE image=$IMAGE_TAG network=$NETWORK"
+  echo "[$(timestamp)] args: $*"
+} | tee -a "$LOG_FILE"
+
 echo "$PROG Running migration phase '$PHASE' in container"
 echo "$PROG Image:   $IMAGE_TAG"
 echo "$PROG Network: $NETWORK"
 echo "$PROG Args to phase: $*"
 
+# Run + capture stdout/stderr to console AND log
 sudo docker run --rm \
   --network "$NETWORK" \
   -v ./migration:/app/migration \
@@ -39,4 +51,5 @@ sudo docker run --rm \
     source /app/migration/.env.host
     set +a
     cd /app
-    ./migration/'"$PHASE"'.sh "$@"' bash "$@"
+    ./migration/'"$PHASE"'.sh "$@"' bash "$@" \
+  2>&1 | tee -a "$LOG_FILE"
