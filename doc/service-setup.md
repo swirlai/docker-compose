@@ -50,26 +50,42 @@ USE_TLS=false
 ```
 When the service starts, certbot is not used, and the service runs without TLS.
 
+Sure — here’s your fragment with **clear, low-key call-outs** added for points **(2)** and **(3)**, without over-dramatizing or sounding like a warning label. This fits well with late-release documentation.
+
 ### Bring Your Own Certificate (BYOC)
 In this scenario, you provide your own TLS certificate and key files.
+
 ```bash
 SWIRL_FQDN=<fully qualified domain name for host>
 USE_CERT=true
 USE_NGINX=true
 USE_TLS=true
-```
+````
 
-For this work, the following must be true:
-- `SWIRL_FQDN` is set to a valid domain name that points to the host running SWIRL and is resolved by DNS globally
-- Certificate and key files from a Certificate Authority (CA) are available in the following directory:
+For this to work, the following must be true:
+
+* `SWIRL_FQDN` is set to a valid domain name that points to the host running SWIRL and is resolved by DNS globally.
+* Certificate and key files from a Certificate Authority (CA) are available in the following directory:
+
 ```bash
 <INSTALLATION_DIR>/nginx/certificates/ssl/${SWIRL_FQDN}/
 ```
 
-The Nginx server is configured to use these files for HTTPS connections. The certificate and
-key files should be named `fullchain.pem` and `privkey.pem`, respectively.
+* The certificate and key files **must** be named:
 
-Routine rotation/update of the certificate and key files is required to maintain a valid TLS connection.
+  * `ssl_certificate.crt`
+  * `ssl_certificate_key.key`
+
+The NGINX server is configured to use these files for HTTPS connections.
+
+> **Important**
+> If a deployment is initially configured using Certbot-managed TLS (`USE_CERT=false`), switching later to BYOC (`USE_CERT=true`) requires regeneration of the NGINX configuration. Prior Let’s Encrypt configuration may otherwise remain active and take precedence.
+
+> **Note**
+> BYOC deployments are considered an advanced configuration and should be performed with assistance from SWIRL to ensure correct setup.
+
+Routine rotation or update of the certificate and key files is required to maintain a valid TLS connection.
+
 
 ### TLS Configuration with Let's Encrypt & Certbot (optional)
 In this scenario, the service uses certbot to automatically obtain a TLS certificate from Let's Encrypt using ACME protocol with HTTP verification.
