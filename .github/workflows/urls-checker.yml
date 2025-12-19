@@ -38,7 +38,7 @@ jobs:
           verbose: true
           timeout: 5
           retry_count: 3
-          exclude_patterns: localhost,api,apis,rss,etc,xx,googleapis,hostname,snowflake,graph.microsoft.com,login.microsoftonline.com,my-host.com,azure.com,github.com,platform.openai.com/docs/guides/chat-completions/getting-started,microsoft-callback,*.sh,tika,ttm
+          exclude_patterns: localhost,api,apis,rss,etc,xx,googleapis,hostname,snowflake,graph.microsoft.com,login.microsoftonline.com,my-host.com,azure.com,github.com,platform.openai.com/docs/guides/chat-completions/getting-started,microsoft-callback,*.sh,tika,ttm,support-ticket
           exclude_files: scripts/
           save: ${{ env.URLCHECK_RESULTS }}
 
