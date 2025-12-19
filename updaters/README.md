@@ -1,5 +1,5 @@
 # Updaters
-These packages facilitate the updating of a docker-compose environment, such as the Swirl VM Offer.
+These packages facilitate the updating of a docker-compose environment, such as the SWIRL VM Offer.
 
 - [Versions](#versions)
 - [Usage](#usage)
@@ -7,7 +7,7 @@ These packages facilitate the updating of a docker-compose environment, such as 
 - [Restoring from Backup](#restoring-from-backup)
 
 ## Versions
-- [4.2.1](https://github.com/swirlai/docker-compose/raw/main/updaters/update_swirl_4_2_1_0_be59405.tar.gz) supports updating the Swirl VM Offer from 4.0 - 4.2.0 to 4.2.1
+- [4.2.1](https://github.com/swirlai/docker-compose/raw/main/updaters/update_swirl_4_2_1_0_be59405.tar.gz) supports updating the SWIRL VM Offer from 4.0 - 4.2.0 to 4.2.1
 
 ## Usage
 
@@ -23,22 +23,22 @@ sudo /app/update_swirl_v.../update.sh
 ```
 
 This will perform the following actions:
-- Stop the Swirl services
-- Backup the current Swirl environment to `/app/backup`
+- Stop the SWIRL services
+- Backup the current SWIRL environment to `/app/backup`
     - files beneath `/app`
-    - Swirl database in gpg encrypted tar file using `ADMIN_PASSWORD` from `/app/.env`
+    - SWIRL database in gpg encrypted tar file using `ADMIN_PASSWORD` from `/app/.env`
 - Update `/app/.env`
-- Prompt operator to authenticate with docker hub using
-- Pull the updated Swirl Docker images
+- Prompt operator to authenticate with Docker hub using
+- Pull the updated SWIRL Docker images
 - Copy required updated files to `/app`, renaming existing with _backup suffix
-- Prompt operator to restart the Swirl services via `sudo systemctl start swirl`
+- Prompt operator to restart the SWIRL services via `sudo systemctl start swirl`
 
 
-Please note: the updater results in storage of docker  credentials in `/root/.docker/config.json` which can be removed after the update is complete. 
+Please note: the updater results in storage of Docker  credentials in `/root/.docker/config.json` which can be removed after the update is complete.
 
 ## Docker Credentials For Updater
-The updater's `docker_login.sh` script prompts the operator to authenticate with Docker Hub using a username and 
-personal access token (PAT). Swirl support will provide the customer with an account invite and you will want to follow 
+The updater's `docker_login.sh` script prompts the operator to authenticate with Docker Hub using a username and
+personal access token (PAT). SWIRL support will provide the customer with an account invite and you will want to follow
 the [Docker Hub instructions to create a PAT](https://docs.docker.com/security/for-developers/access-tokens/#create-an-access-token).
 
 The basic process is as follows:
@@ -59,14 +59,14 @@ sudo /app/restore.sh /app/backup/<backup-file>
 ```
 
 The script will
-1. Stop the Swirl service
+1. Stop the SWIRL service
 2. Verify that the correct offline containers exist
 3. Use the `ADMIN_PASSWORD` from `/app/.env` to decrypt the database backup
 4. Start postgres and restore the database
 5. Restore the files from the backup
 6. Cleaup the unencrypted backup files
 
-After the restore is complete, you can restart the Swirl services via
+After the restore is complete, you can restart the SWIRL services via
 ```bash
 sudo systemctl start swirl
 ```

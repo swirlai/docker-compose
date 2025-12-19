@@ -57,13 +57,13 @@ if [ "$AZ_GOV_COMPATIBLE" == "true" ]; then
   sed 's/microsoft\.com/microsoft.us/g' "$PROVIDERS_FILE" > "$tmp_file" && mv "$tmp_file" "$PROVIDERS_FILE"
 fi
 
-# Load Swirl's initial data
+# Load SWIRL's initial data
 python swirl.py load_data
 python swirl.py reload_ai_prompts
 python swirl.py load_branding
 
-# Optionally Swirl API User if environment variables are set
+# Optionally SWIRL API User if environment variables are set
 if [ -n "$SWIRL_API_USERNAME" ] && [ -n "$SWIRL_API_PASSWORD" ]; then
-  echo "MCP Support: Creating Swirl API user: $SWIRL_API_USERNAME"
+  echo "MCP Support: Creating SWIRL API user: $SWIRL_API_USERNAME"
   python manage.py shell -c "from django.contrib.auth.models import User, Group; user=User.objects.create_user(username='${SWIRL_API_USERNAME}', password='${SWIRL_API_PASSWORD}'); group, _ = Group.objects.get_or_create(name='swirl_auto_provisioned_group'); user.groups.add(group)"
 fi

@@ -61,15 +61,15 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d swirl"]
+      test: ["CMD-SHELL", "pg_isready -U ${SQL_USER:-postgres} -d ${SQL_DATABASE:-swirl}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  redis:
+  redis-broker:
     profiles: ["all", "svc", "redis"]
     image: redis:${REDIS_VERSION:-7}
-    container_name: swirl_redis
+    container_name: swirl_redis_broker
     networks: ["swirl"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -77,8 +77,18 @@ services:
       timeout: 5s
       retries: 5
 
+  redis-cache:
+    profiles: ["all", "svc", "redis"]
+    image: redis:${REDIS_VERSION:-7}
+    container_name: swirl_redis_cache
+    networks: ["swirl"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   mcp:
-    profiles: [ "all", "svc", "mcp" ]
+    profiles: [ "all", "mcp" ]
     image: swirlai/release-mcp-proxy-enterprise:${MCP_VERSION}
     container_name: swirl_mcp
     networks: [ "swirl" ]
@@ -118,7 +128,7 @@ services:
 
   swirl-job:
     profiles: ["all", "setup"]
-    image: swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}
+    image: ${SWIRL_PATH}:${SWIRL_VERSION}
     container_name: swirl_app_job
     restart: "no"
     env_file:
@@ -133,7 +143,7 @@ services:
 
   swirl-init:
     profiles: ["all", "svc", "swirl"]
-    image: swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}
+    image: ${SWIRL_PATH}:${SWIRL_VERSION}
     container_name: swirl_app_init
     env_file:
       - .env
@@ -142,15 +152,18 @@ services:
 
   swirl:
     profiles: ["all", "svc", "swirl"]
-    image: swirlai/release-swirl-search-enterprise:${SWIRL_VERSION}
+    image: ${SWIRL_PATH}:${SWIRL_VERSION}
     container_name: swirl_app
     env_file:
       - .env
     ports:
-      - "8000:8000"
+      - "${SWIRL_PORT:-8000}:${SWIRL_PORT:-8000}"
     depends_on:
-      redis:
+      redis-broker:
         condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+
       swirl-init:
         condition: service_completed_successfully
     command: ["/bin/bash","/tmp/swirl-load.sh"]

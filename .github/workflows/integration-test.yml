@@ -1,4 +1,4 @@
-name: Swirl - Integration Tests
+name: SWIRL - Integration Tests
 
 on:
   push:
