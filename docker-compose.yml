@@ -171,6 +171,7 @@ services:
       - ./nginx/nginx.template:/nginx/nginx.template
       - ./scripts/swirl-load.sh:/tmp/swirl-load.sh
       - ./uploads/:/app/uploads/
+      - ./logs:/app/logs
     networks: ["swirl"]
     healthcheck:
       test: ["CMD-SHELL", "/app/swirl-health-check.sh || exit 1"]
