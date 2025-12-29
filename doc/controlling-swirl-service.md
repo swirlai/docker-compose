@@ -9,9 +9,9 @@ To start or stop the SWIRL service, you can use the following commands:
 
 ### Linux
 ```bash
-sudo systemctl start SWIRL
-sudo systemctl stop SWIRL
-sudo systemctl restart SWIRL
+sudo systemctl start swirl
+sudo systemctl stop swirl
+sudo systemctl restart swirl
 ```
 ### MacOS
 
