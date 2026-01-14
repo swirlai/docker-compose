@@ -114,9 +114,11 @@ if [ "$USE_NGINX" == "true" ]; then
 
             if ! grep -Fq "$UPDATE_MARKER" "$TEMPLATE_FILE"; then
                 log "Update Marker not found, adding TLS configuration to Nginx ${TEMPLATE_FILE}"
+
                 awk -v update_marker="$UPDATE_MARKER" '
                 {
-                    if (prev ~ /listen 443 ssl;/ && $0 ~ /server_name .*;/) {
+                    # ---- Existing behavior: inject TLS directives after the 443 server_name line ----
+                    if (prev ~ /listen[[:space:]]+443[[:space:]]+ssl;/ && $0 ~ /server_name[[:space:]].*;/) {
                         print
                         print ""
                         print "      " update_marker
@@ -124,9 +126,35 @@ if [ "$USE_NGINX" == "true" ]; then
                         print "      ssl_certificate_key /etc/letsencrypt/live/${SWIRL_FQDN}/privkey.pem;"
                         print "      include /etc/letsencrypt/options-ssl-nginx.conf;"
                         print "      ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;"
-                    } else {
-                        print
+                        prev = $0
+                        next
                     }
+
+                    # ---- New behavior (Step 1): ensure ACME challenge location exists on the 80 server ----
+                    # We inject it immediately after the "server_name ..." line in the port-80 server block,
+                    # BUT only if this template does not already contain /.well-known/acme-challenge/.
+                    if (!acme_seen && $0 ~ /\/\.well-known\/acme-challenge\//) {
+                        acme_seen = 1
+                    }
+
+                    if (!acme_injected && !acme_seen &&
+                        prev ~ /listen[[:space:]]+80;/ &&
+                        $0 ~ /server_name[[:space:]].*;/) {
+
+                        print
+                        print ""
+                        print "      # swirl-service updated: add ACME webroot location"
+                        print "      location ^~ /.well-known/acme-challenge/ {"
+                        print "          root /var/www/certbot;"
+                        print "          default_type \"text/plain\";"
+                        print "          try_files $uri =404;"
+                        print "      }"
+                        acme_injected = 1
+                        prev = $0
+                        next
+                    }
+
+                    print
                     prev = $0
                 }
                 ' "$TEMPLATE_FILE" > tmp && mv tmp "$TEMPLATE_FILE"
@@ -144,13 +172,27 @@ if [ "$USE_NGINX" == "true" ]; then
 
             # when renewal not required
             # we use existing certifiactes
-            certbot certonly --standalone --email $CERTBOT_EMAIL \
-              --agree-tos --no-eff-email -d "${SWIRL_FQDN}" \
-              --config-dir /certbot/conf \
-              --non-interactive --quiet
+            certbot certonly --standalone \
+            --email "$CERTBOT_EMAIL" \
+            --agree-tos --no-eff-email \
+            -d "$SWIRL_FQDN" \
+            --config-dir "$PARENT_DIR/certbot/conf" \
+            --non-interactive
+
+            ## Now reset the cert to use webroot, we will is this mode in the certbot container
+            docker compose run --rm \
+            -e SWIRL_FQDN="$SWIRL_FQDN" \
+            -e CERTBOT_EMAIL="$CERTBOT_EMAIL" \
+            certbot certonly \
+                --webroot -w /var/www/certbot \
+                --email "$CERTBOT_EMAIL" \
+                --agree-tos --no-eff-email \
+                -d "$SWIRL_FQDN" \
+                --config-dir /certbot/conf \
+                --cert-name "$SWIRL_FQDN" \
+                --keep-until-expiring
 
             cp -a /certbot/conf/. $PARENT_DIR/certbot/conf
-
             cp $PARENT_DIR/nginx/nginx-template.tls $PARENT_DIR/nginx/nginx.template
 
         elif [ "$USE_CERT" == "true" ]; then

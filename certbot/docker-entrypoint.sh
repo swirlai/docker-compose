@@ -30,7 +30,10 @@ else
   echo "Certbot is enabled. Starting the service..."
 
   while true; do
-    certbot renew --no-random-sleep-on-renew --config-dir /certbot/conf
+    certbot renew \
+      --no-random-sleep-on-renew \
+      --config-dir /certbot/conf \
+      --deploy-hook 'touch /var/run/certbot/nginx-reload'
 
     # Update liveness after each renewal attempt
     update_liveness "healthy"

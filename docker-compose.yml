@@ -48,7 +48,29 @@ services:
     depends_on:
       swirl:
         condition: service_healthy
-
+  nginx_reloader:
+    profiles: ["all", "nginx", "certbot"]
+    image: alpine:3.20
+    container_name: swirl_nginx_reloader
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./certbot/run/:/var/run/certbot
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      apk add --no-cache docker-cli inotify-tools &&
+      echo "[reloader] watching for /var/run/certbot/nginx-reload" &&
+      mkdir -p /var/run/certbot &&
+      touch /var/run/certbot/nginx-reload &&
+      while inotifywait -e close_write,create,move /var/run/certbot/nginx-reload; do
+        echo "[reloader] reload signal detected; reloading nginx..." &&
+        docker exec swirl_nginx nginx -t &&
+        docker exec swirl_nginx nginx -s reload &&
+        echo "[reloader] nginx reloaded"
+      done
+    depends_on:
+      nginx:
+        condition: service_started
   postgres:
     profiles: ["all", "db"]
     image: postgres:${POSTGRES_VERSION:-16}
