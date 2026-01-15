@@ -21,9 +21,6 @@ services:
       - ./certbot/www/:/var/www/certbot/:ro
       - ./nginx/certificates/ssl/:/etc/nginx/ssl/:ro
     entrypoint: ["/tmp/docker-entrypoint.sh"]
-    depends_on:
-      swirl:
-        condition: service_healthy
 
   certbot:
     profiles: ["all", "certbot"]
@@ -33,6 +30,7 @@ services:
     volumes:
       - ./certbot/conf/:/certbot/conf
       - ./certbot/www/:/var/www/certbot
+      - ./certbot/run/:/var/run/certbot     # <-- add this
       - ./certbot/docker-entrypoint.sh:/tmp/docker-entrypoint.sh
     entrypoint: ["/tmp/docker-entrypoint.sh"]
     environment:
@@ -46,8 +44,9 @@ services:
       retries: 5
     networks: ["swirl"]
     depends_on:
-      swirl:
-        condition: service_healthy
+      nginx:
+        condition: service_started          # <-- change this
+
   nginx_reloader:
     profiles: ["all", "nginx", "certbot"]
     image: alpine:3.20
