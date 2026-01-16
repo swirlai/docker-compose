@@ -41,10 +41,19 @@ fi
 
 # ---- helpers ----
 
+staging_args() {
+  if [ "${CERTBOT_STAGING:-false}" = "true" ]; then
+    echo "--staging"
+  fi
+}
+
+cert_name() {
+  echo "${SWIRL_FQDN}"
+}
+
 have_cert() {
-  [ -n "$SWIRL_FQDN" ] && \
-  [ -f "$CONFIG_DIR/live/$SWIRL_FQDN/fullchain.pem" ] && \
-  [ -f "$CONFIG_DIR/live/$SWIRL_FQDN/privkey.pem" ]
+  CN="$(cert_name)"
+  [ -n "$SWIRL_FQDN" ] && [ -f "$CONFIG_DIR/renewal/${CN}.conf" ]
 }
 
 wait_for_nginx_acme() {
@@ -99,7 +108,12 @@ PY
 
 issue_cert_webroot() {
   info "Issuing certificate for $SWIRL_FQDN via webroot..."
+
+  STAGING_ARGS="$(staging_args)"
+  [ -n "$STAGING_ARGS" ] && info "Using Let's Encrypt STAGING environment."
+
   certbot certonly \
+    $STAGING_ARGS \
     --webroot -w "$WEBROOT_DIR" \
     --email "$CERTBOT_EMAIL" \
     --agree-tos --no-eff-email \
@@ -128,16 +142,30 @@ fi
 
 # ---- renew loop ----
 
+SLEEP_SECS="${CERTBOT_RENEW_INTERVAL_SECONDS:-43200}"  # default: 12h
+
+STAGING_ARGS="$(staging_args)"
+if [ -n "$STAGING_ARGS" ]; then
+  info "Using Let's Encrypt STAGING environment for renew."
+fi
+
 while true; do
-  info "Running: certbot renew"
+  if [ "${CERTBOT_RENEW_TEST:-false}" = "true" ]; then
+    info "TEST MODE: running certbot renew --dry-run every ${SLEEP_SECS}s"
+    RENEW_EXTRA_ARGS="--dry-run -v"
+  else
+    info "Running: certbot renew"
+    RENEW_EXTRA_ARGS="--quiet"
+  fi
 
   set +e
   certbot renew \
+    $STAGING_ARGS \
     --no-random-sleep-on-renew \
     --config-dir "$CONFIG_DIR" \
     --work-dir "$WORK_DIR" \
     --logs-dir "$LOGS_DIR" \
-    --quiet \
+    $RENEW_EXTRA_ARGS \
     --deploy-hook "date > $RELOAD_FILE"
   rc=$?
   set -e
@@ -150,5 +178,11 @@ while true; do
     update_liveness "unhealthy"
   fi
 
-  sleep 12h
+  # In test mode, force the reload signal so you can exercise the reloader path
+  # even when certbot decides no renewal is due.
+  if [ "${CERTBOT_RENEW_TEST:-false}" = "true" ]; then
+    date > "$RELOAD_FILE"
+  fi
+
+  sleep "$SLEEP_SECS"
 done

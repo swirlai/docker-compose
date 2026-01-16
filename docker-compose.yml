@@ -39,6 +39,9 @@ services:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
       SWIRL_FQDN: ${SWIRL_FQDN}
       USE_CERT: ${USE_CERT:-false}
+      CERTBOT_RENEW_TEST: "true"
+      CERTBOT_RENEW_INTERVAL_SECONDS: "300"
+      CERTBOT_STAGING: "true"   # staging ACME server (avoids prod rate limits)
     healthcheck:
       test: ["CMD", "grep", "-q", "healthy", "/etc/certbot/health"]
       interval: 30s
