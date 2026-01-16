@@ -92,109 +92,62 @@ fi
 if [ "$USE_NGINX" == "true" ]; then
     if [ "$USE_TLS" == "true" ]; then
         if [ "$USE_CERT" == "false" ]; then
-            log "TLS enabled with Certbot. Starting Nginx and Certbot."
-            log "Issuing certificate using Certbot."
-
-            log "Waiting DNS propagation before Certbot request..."
-            MAX_WAIT=300
-            WAITED=0
-            while ! nslookup  "$SWIRL_FQDN" >/dev/null; do
-                if [ "$WAITED" -ge "$MAX_WAIT" ]; then
-                    error "DNS name $SWIRL_FQDN did not resolve after $MAX_WAIT seconds."
-                    exit 1
-                fi
-                sleep 1
-                WAITED=$((WAITED + 1))
-            done
-
-            log "DNS name $SWIRL_FQDN resolved after $WAITED seconds."
+            log "TLS enabled with Certbot. Starting Nginx; cert issuance/renewal handled by certbot container."
 
             TEMPLATE_FILE="$PARENT_DIR/nginx/nginx-template.tls"
             UPDATE_MARKER="# swirl-service updated: USE_TLS=true, USE_CERT=false"
 
             if ! grep -Fq "$UPDATE_MARKER" "$TEMPLATE_FILE"; then
-                log "Update Marker not found, adding TLS configuration to Nginx ${TEMPLATE_FILE}"
+            log "Update Marker not found; ensuring TLS + ACME configuration exists in ${TEMPLATE_FILE}"
 
-                awk -v update_marker="$UPDATE_MARKER" '
-                {
-                    # ---- Existing behavior: inject TLS directives after the 443 server_name line ----
-                    if (prev ~ /listen[[:space:]]+443[[:space:]]+ssl;/ && $0 ~ /server_name[[:space:]].*;/) {
-                        print
-                        print ""
-                        print "      " update_marker
-                        print "      ssl_certificate /etc/letsencrypt/live/${SWIRL_FQDN}/fullchain.pem;"
-                        print "      ssl_certificate_key /etc/letsencrypt/live/${SWIRL_FQDN}/privkey.pem;"
-                        print "      include /etc/letsencrypt/options-ssl-nginx.conf;"
-                        print "      ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;"
-                        prev = $0
-                        next
-                    }
+            tmp="$(mktemp)"
+            awk -v update_marker="$UPDATE_MARKER" '
+            {
+                if ($0 ~ /\/\.well-known\/acme-challenge\//) acme_seen = 1
 
-                    # ---- New behavior (Step 1): ensure ACME challenge location exists on the 80 server ----
-                    # We inject it immediately after the "server_name ..." line in the port-80 server block,
-                    # BUT only if this template does not already contain /.well-known/acme-challenge/.
-                    if (!acme_seen && $0 ~ /\/\.well-known\/acme-challenge\//) {
-                        acme_seen = 1
-                    }
-
-                    if (!acme_injected && !acme_seen &&
-                        prev ~ /listen[[:space:]]+80;/ &&
-                        $0 ~ /server_name[[:space:]].*;/) {
-
-                        print
-                        print ""
-                        print "      # swirl-service updated: add ACME webroot location"
-                        print "      location ^~ /.well-known/acme-challenge/ {"
-                        print "          root /var/www/certbot;"
-                        print "          default_type \"text/plain\";"
-                        print "          try_files $uri =404;"
-                        print "      }"
-                        acme_injected = 1
-                        prev = $0
-                        next
-                    }
-
-                    print
-                    prev = $0
+                if (prev ~ /listen[[:space:]]+443[[:space:]]+ssl;/ && $0 ~ /server_name[[:space:]].*;/) {
+                print
+                print ""
+                print "      " update_marker
+                print "      ssl_certificate /etc/letsencrypt/live/${SWIRL_FQDN}/fullchain.pem;"
+                print "      ssl_certificate_key /etc/letsencrypt/live/${SWIRL_FQDN}/privkey.pem;"
+                print "      include /etc/letsencrypt/options-ssl-nginx.conf;"
+                print "      ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;"
+                prev = $0
+                next
                 }
-                ' "$TEMPLATE_FILE" > tmp && mv tmp "$TEMPLATE_FILE"
+
+                if (!acme_injected && !acme_seen &&
+                    prev ~ /listen[[:space:]]+80;/ &&
+                    $0 ~ /server_name[[:space:]].*;/) {
+
+                print
+                print ""
+                print "      # swirl-service updated: add ACME webroot location"
+                print "      location ^~ /.well-known/acme-challenge/ {"
+                print "          root /var/www/certbot;"
+                print "          default_type \"text/plain\";"
+                print "          try_files $uri =404;"
+                print "      }"
+                acme_injected = 1
+                prev = $0
+                next
+                }
+
+                print
+                prev = $0
+            }
+            ' "$TEMPLATE_FILE" > "$tmp" && mv "$tmp" "$TEMPLATE_FILE"
             fi
 
-            OPTIONS_FILE="$PARENT_DIR/certbot/conf/options-ssl-nginx.conf"
-            DHPARAMS_FILE="$PARENT_DIR/certbot/conf/ssl-dhparams.pem"
-
-            TARGET_DIR="$PARENT_DIR/nginx/certificates/ssl"
-
-            mkdir -p $TARGET_DIR
-            cp "$OPTIONS_FILE" "$TARGET_DIR/"
-            cp "$DHPARAMS_FILE" "$TARGET_DIR/"
-            log "Copied TLS configs to $TARGET_DIR"
-
-            # when renewal not required
-            # we use existing certifiactes
-            certbot certonly --standalone \
-            --email "$CERTBOT_EMAIL" \
-            --agree-tos --no-eff-email \
-            -d "$SWIRL_FQDN" \
-            --config-dir "$PARENT_DIR/certbot/conf" \
-            --non-interactive
-
-            ## Now reset the cert to use webroot, we will is this mode in the certbot container
-            docker compose run --rm \
-            -e SWIRL_FQDN="$SWIRL_FQDN" \
-            -e CERTBOT_EMAIL="$CERTBOT_EMAIL" \
-            certbot certonly \
-                --webroot -w /var/www/certbot \
-                --email "$CERTBOT_EMAIL" \
-                --agree-tos --no-eff-email \
-                -d "$SWIRL_FQDN" \
-                --config-dir /certbot/conf \
-                --cert-name "$SWIRL_FQDN" \
-                --keep-until-expiring
-
-            cp -a /certbot/conf/. $PARENT_DIR/certbot/conf
-            cp $PARENT_DIR/nginx/nginx-template.tls $PARENT_DIR/nginx/nginx.template
-
+            CERT_LIVE_DIR="$PARENT_DIR/certbot/conf/live/$SWIRL_FQDN"
+            if [ -f "$CERT_LIVE_DIR/fullchain.pem" ] && [ -f "$CERT_LIVE_DIR/privkey.pem" ]; then
+                log "Cert files found; using TLS Nginx template."
+                cp "$PARENT_DIR/nginx/nginx-template.tls" "$PARENT_DIR/nginx/nginx.template"
+            else
+                log "Cert files not found yet; using bootstrap HTTP Nginx template."
+                cp "$PARENT_DIR/nginx/nginx-template.bootstrap" "$PARENT_DIR/nginx/nginx.template"
+            fi
         elif [ "$USE_CERT" == "true" ]; then
             log "TLS enabled with owned certificate. Starting Nginx without Certbot."
 

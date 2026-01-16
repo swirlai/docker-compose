@@ -32,6 +32,8 @@ services:
       - ./certbot/www/:/var/www/certbot
       - ./certbot/run/:/var/run/certbot     # <-- add this
       - ./certbot/docker-entrypoint.sh:/tmp/docker-entrypoint.sh
+      - ./certbot/work/:/certbot/work
+      - ./certbot/logs/:/certbot/logs
     entrypoint: ["/tmp/docker-entrypoint.sh"]
     environment:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
@@ -55,18 +57,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./certbot/run/:/var/run/certbot
-    entrypoint: ["/bin/sh", "-c"]
-    command: >
-      apk add --no-cache docker-cli inotify-tools &&
-      echo "[reloader] watching for /var/run/certbot/nginx-reload" &&
-      mkdir -p /var/run/certbot &&
-      touch /var/run/certbot/nginx-reload &&
-      while inotifywait -e close_write,create,move /var/run/certbot/nginx-reload; do
-        echo "[reloader] reload signal detected; reloading nginx..." &&
-        docker exec swirl_nginx nginx -t &&
-        docker exec swirl_nginx nginx -s reload &&
-        echo "[reloader] nginx reloaded"
-      done
+      - ./nginx/:/nginx
+    environment:
+      SWIRL_FQDN: ${SWIRL_FQDN}
+    entrypoint: ["/bin/sh", "/nginx/reloader.sh"]
     depends_on:
       nginx:
         condition: service_started
