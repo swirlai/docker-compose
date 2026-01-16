@@ -154,6 +154,7 @@ services:
     command: ["/bin/bash","/tmp/swirl-load-job.sh"]
     volumes:
       - ./scripts/swirl-load-job.sh:/tmp/swirl-load-job.sh
+      - ./:/host               # <-- add this (repo root visible inside container)
     networks: ["swirl"]
     depends_on:
       swirl:

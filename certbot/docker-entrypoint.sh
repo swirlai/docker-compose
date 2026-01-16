@@ -1,4 +1,62 @@
 #!/bin/sh
+#
+# certbot-entrypoint.sh
+#
+# Function:
+# ----------
+# Runs Certbot inside a container for:
+#   1) Initial certificate issuance (HTTP-01 via nginx webroot), and
+#   2) Periodic renewals.
+#
+# Trigger / Integration:
+# ----------------------
+# - Uses webroot: /var/www/certbot (shared with nginx) for HTTP-01 challenges.
+# - Signals nginx reloads by touching: /var/run/certbot/nginx-reload
+#   (consumed by the nginx_reloader container via inotify).
+#
+# Startup Behavior:
+# -----------------
+# - If USE_CERT=true: certbot is disabled (owned certificates are used) and this
+#   container stays alive for healthcheck stability.
+# - Validates required env: SWIRL_FQDN and CERTBOT_EMAIL.
+# - If no existing renewal config is found, waits for nginx to serve the ACME
+#   challenge path and performs initial issuance.
+#
+# Renewal Behavior:
+# -----------------
+# - Runs `certbot renew` in a loop (default interval: 12h).
+# - On successful deploy, touches the reload signal file via deploy-hook.
+# - Updates a simple liveness file at /etc/certbot/health for docker healthcheck.
+#
+# Environment Knobs:
+# ------------------
+# - CERTBOT_STAGING=true
+#     Use Let's Encrypt staging CA (untrusted certs; safe for repeated tests).
+# - CERTBOT_RENEW_TEST=true
+#     Runs renew in test mode (`--dry-run -v`) and forces a reload signal each loop.
+# - CERTBOT_RENEW_INTERVAL_SECONDS=<N>
+#     Overrides sleep interval between renewal attempts (default: 43200 = 12h).
+#
+# Volumes / Paths:
+# ---------------
+# - /certbot/conf  : Certbot config + certificates (persisted)
+# - /certbot/work  : Certbot work dir
+# - /certbot/logs  : Certbot logs dir
+# - /var/www/certbot: ACME webroot (shared with nginx)
+# - /var/run/certbot: Reload signal (shared with nginx_reloader)
+#
+# Troubleshooting:
+# ----------------
+# - Initial issuance stuck:
+#     Check nginx serves the ACME path:
+#       http://nginx/.well-known/acme-challenge/_healthcheck
+# - Renew not reloading nginx:
+#     Confirm deploy-hook touched /var/run/certbot/nginx-reload and review
+#     nginx_reloader logs.
+# - Rate limits:
+#     Use CERTBOT_STAGING=true for testing/iteration.
+#
+
 set -e
 
 STATUS_DIR="/etc/certbot"
