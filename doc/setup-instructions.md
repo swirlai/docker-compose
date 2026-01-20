@@ -52,19 +52,7 @@ sudo ./scripts/install.sh
 
 ---
 
-### 5. Authenticate to Docker Hub
-
-Create a [Docker Hub Personal Access Token (PAT)](./create-dockerhub-pat.md) for your Docker Hub user.
-
-Then, run this script to log in using the new PAT:
-
-```sh
-sudo ./scripts/docker-login.sh
-```
-
----
-
-### 6. Install the SWIRL Docker images
+### 5. Install the SWIRL Docker images
 
 
 ```sh
@@ -73,7 +61,7 @@ sudo ./scripts/install-docker-images.sh
 
 ---
 
-### 7. Start SWIRL and Monitor Logs
+### 6. Start SWIRL and Monitor Logs
 
 #### **On Linux**
 
