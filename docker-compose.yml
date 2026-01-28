@@ -39,9 +39,9 @@ services:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
       SWIRL_FQDN: ${SWIRL_FQDN}
       USE_CERT: ${USE_CERT:-false}
-      CERTBOT_RENEW_TEST: "false"
-      CERTBOT_RENEW_INTERVAL_SECONDS: "43200"
-      CERTBOT_STAGING: "false"
+      CERTBOT_RENEW_TEST: ${CERTBOT_RENEW_TEST:-false}
+      CERTBOT_RENEW_INTERVAL_SECONDS: ${CERTBOT_RENEW_INTERVAL_SECONDS:-43200}
+      CERTBOT_STAGING: ${CERTBOT_STAGING:-false}
     healthcheck:
       test: ["CMD", "grep", "-q", "healthy", "/etc/certbot/health"]
       interval: 30s
