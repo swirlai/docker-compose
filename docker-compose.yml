@@ -21,9 +21,6 @@ services:
       - ./certbot/www/:/var/www/certbot/:ro
       - ./nginx/certificates/ssl/:/etc/nginx/ssl/:ro
     entrypoint: ["/tmp/docker-entrypoint.sh"]
-    depends_on:
-      swirl:
-        condition: service_healthy
 
   certbot:
     profiles: ["all", "certbot"]
@@ -33,12 +30,18 @@ services:
     volumes:
       - ./certbot/conf/:/certbot/conf
       - ./certbot/www/:/var/www/certbot
+      - ./certbot/run/:/var/run/certbot
       - ./certbot/docker-entrypoint.sh:/tmp/docker-entrypoint.sh
+      - ./certbot/work/:/certbot/work
+      - ./certbot/logs/:/certbot/logs
     entrypoint: ["/tmp/docker-entrypoint.sh"]
     environment:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
       SWIRL_FQDN: ${SWIRL_FQDN}
       USE_CERT: ${USE_CERT:-false}
+      CERTBOT_RENEW_TEST: ${CERTBOT_RENEW_TEST:-false}
+      CERTBOT_RENEW_INTERVAL_SECONDS: ${CERTBOT_RENEW_INTERVAL_SECONDS:-43200}
+      CERTBOT_STAGING: ${CERTBOT_STAGING:-false}
     healthcheck:
       test: ["CMD", "grep", "-q", "healthy", "/etc/certbot/health"]
       interval: 30s
@@ -46,9 +49,24 @@ services:
       retries: 5
     networks: ["swirl"]
     depends_on:
-      swirl:
-        condition: service_healthy
+      nginx:
+        condition: service_started
 
+  nginx_reloader:
+    profiles: ["all", "nginx", "certbot"]
+    image: alpine:3.20
+    container_name: swirl_nginx_reloader
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./certbot/run/:/var/run/certbot
+      - ./nginx/:/nginx
+    environment:
+      SWIRL_FQDN: ${SWIRL_FQDN}
+    entrypoint: ["/bin/sh", "/nginx/reloader.sh"]
+    depends_on:
+      nginx:
+        condition: service_started
   postgres:
     profiles: ["all", "db"]
     image: postgres:${POSTGRES_VERSION:-16}
@@ -136,6 +154,7 @@ services:
     command: ["/bin/bash","/tmp/swirl-load-job.sh"]
     volumes:
       - ./scripts/swirl-load-job.sh:/tmp/swirl-load-job.sh
+      - ./:/host               # <-- add this (repo root visible inside container)
     networks: ["swirl"]
     depends_on:
       swirl:

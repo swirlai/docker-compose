@@ -67,3 +67,8 @@ if [ -n "$SWIRL_API_USERNAME" ] && [ -n "$SWIRL_API_PASSWORD" ]; then
   echo "MCP Support: Creating SWIRL API user: $SWIRL_API_USERNAME"
   python manage.py shell -c "from django.contrib.auth.models import User, Group; user=User.objects.create_user(username='${SWIRL_API_USERNAME}', password='${SWIRL_API_PASSWORD}'); group, _ = Group.objects.get_or_create(name='swirl_auto_provisioned_group'); user.groups.add(group)"
 fi
+
+# Mark one-time setup as complete (only reached if everything succeeded)
+FLAG_PATH="/host/.swirl-application-setup-job-complete.flag"
+echo "Setup complete; writing flag: $FLAG_PATH"
+touch "$FLAG_PATH"

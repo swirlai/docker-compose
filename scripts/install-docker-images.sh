@@ -42,7 +42,7 @@ else
     log "Local SWIRL image ${SWIRL_PATH}:${SWIRL_VERSION} not found locally."
 fi
 
-ACTIVE_PROFILES="$(get_active_profiles)"
+ACTIVE_PROFILES="$(INCLUDE_SETUP_PROFILE=false get_active_profiles)"
 log "Pulling images from Docker Hub for profiles: ${ACTIVE_PROFILES:-<none>}"
 
 COMPOSE_PROFILES="${ACTIVE_PROFILES}" \
