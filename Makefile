@@ -24,8 +24,10 @@ ifeq ($(filter deployment clean,$(MAKECMDGOALS)),)
 endif
 
 TAR_NAME := migration_$(FROM)_to_$(TO).tar.gz
+UPGRADE_TAR_NAME := upgrade_$(FROM)_to_$(TO).tar.gz
 DEPLOY_TS := $(shell date +"%Y-%m-%d_%H%M")
 DEPLOY_TAR := deployment_$(DEPLOY_TS).tar.gz
+
 
 .PHONY: all clean deployment
 
@@ -39,6 +41,11 @@ deployment:
 		--exclude=.git \
 		--exclude='*.tar.gz' \
 		.
+upgrade:
+	tar czf $(UPGRADE_TAR_NAME) \
+		--exclude=.git \
+		--exclude='*.tar.gz' \
+		updaters/swirl-upgrade-$(FROM)-to-$(TO)
 
 clean:
-	rm -f migration_*.tar.gz deployment_*.tar.gz
+	rm -f migration_*.tar.gz deployment_*.tar.gz upgrade_*.tar.gz
