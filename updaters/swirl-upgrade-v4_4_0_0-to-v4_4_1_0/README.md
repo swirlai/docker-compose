@@ -1,9 +1,104 @@
-```bash
-sudo /tmp/upgrade/upgrade.sh \
-  --app-dir /app \
-  --release-dir /tmp/docker-compose-4_4_1_0/docker-compose-4_4_1_0
-```
+Here is a concise, customer-facing version suitable for distribution with the upgrader:
+
+---
+
+# Swirl Upgrade Guide
+
+## 4.4.0 → 4.4.1 (Docker Compose)
+
+This package provides a supported upgrade path for Swirl Docker Compose deployments from **v4_4_0_0** to **v4_4_1_0**.
+
+The upgrade is safe, snapshot-based, and preserves your existing configuration.
+
+---
+
+# What This Upgrade Does
+
+The upgrader will:
+
+* Create a backup under `/app/rollback/`
+* Preserve your:
+
+  * `.env`
+  * `nginx/nginx.template`
+  * certificates and runtime data
+* Replace support files (compose file, scripts, entrypoints)
+* Update container image versions
+* Pull new images
+* Restart services
+* Run required database migrations
+
+Database changes in 4.4.1 are additive and backward-compatible.
+
+---
+
+# Prerequisites
+
+* Existing Swirl installation in `/app`
+* Docker and Docker Compose installed
+* 4.4.1 release package unpacked on the host
+* Root or sudo access
+
+---
+
+# Run the Upgrade
+
+1. Unpack the 4.4.1 release tarball:
 
 ```bash
-sudo /tmp/upgrade/rollback.sh --app-dir /app --last
+tar -xzf docker-compose-4_4_1_0.tar.gz
 ```
+
+2. Run the upgrader:
+
+```bash
+sudo ./upgrade.sh \
+  --app-dir /app \
+  --release-dir /path/to/docker-compose-4_4_1_0
+```
+
+Example:
+
+```bash
+sudo ./upgrade.sh \
+  --app-dir /app \
+  --release-dir /home/azureuser/docker-compose-4_4_1_0
+```
+
+---
+
+# Verify the Upgrade
+
+```bash
+cd /app
+docker compose ps
+```
+
+If needed:
+
+```bash
+docker logs swirl_app --tail=200
+docker logs swirl_app_init --tail=200
+```
+
+---
+
+# Rollback (If Needed)
+
+To revert to the previous version:
+
+```bash
+sudo ./rollback.sh --app-dir /app --last
+```
+
+This restores the previous configuration and restarts the stack.
+
+---
+
+# Notes
+
+* Customer configuration files are preserved.
+* No Docker login is required (images are public).
+* The process is repeatable and safe to re-run if necessary.
+
+If you experience any issues, please contact Swirl Support.
