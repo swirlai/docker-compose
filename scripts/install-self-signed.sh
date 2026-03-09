@@ -1,4 +1,4 @@
-export SWIRL_FQDN="updswirl440-441-2.swirl-metasearch.com"
+export SWIRL_FQDN="updswirl4400-4411-1.swirl-metasearch.com"
 export INSTALLATION_DIR="/app"
 export SSL_DIR="${INSTALLATION_DIR}/nginx/certificates/ssl/${SWIRL_FQDN}"
 

@@ -11,7 +11,7 @@ Usage:
 
 Examples:
   sudo ./rollback.sh --app-dir /app --last
-  sudo ./rollback.sh --app-dir /app --snapshot /app/rollback/4.4.0-to-4.4.1-20260224-101500
+  sudo ./rollback.sh --app-dir /app --snapshot /app/rollback/4.4.0.0-to-4.4.1.1-20260309-101500
 
 Notes:
   - Does not attempt DB restore (safe for additive-column migrations).

@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
-# upgrade.sh - Upgrade Swirl docker-compose support files from 4.4.0 -> 4.4.1
+# upgrade.sh - Upgrade Swirl docker-compose support files from 4.4.0.0 -> 4.4.1.1
 #
 # Preserves (never overwritten):
 #   - /app/.env   (but we may update selected image version keys in-place)
 #   - /app/nginx/nginx.template
 #
-# Copies managed files from an unpacked 4.4.1 release tarball directory into /app,
+# Copies managed files from an unpacked 4.4.1.1 release tarball directory into /app,
 # pulls images (via scripts/install-docker-images.sh), then runs docker compose up
 # + migrations in a safe order.
 #
 # Typical usage:
-#   sudo ./upgrade.sh --app-dir /app --release-dir /tmp/docker-compose-4_4_1_0/docker-compose-4_4_1_0
+#   sudo ./upgrade.sh --app-dir /app --release-dir /tmp/docker-compose-4_4_1_1/docker-compose-4_4_1_1
 #
 set -euo pipefail
 
 usage() {
   cat <<'USAGE'
 Usage:
-  sudo ./upgrade.sh --app-dir /app --release-dir /path/to/docker-compose-4_4_1_0/docker-compose-4_4_1_0 \
+  sudo ./upgrade.sh --app-dir /app --release-dir /path/to/docker-compose-4_4_1_1/docker-compose-4_4_1_1 \
     [--manifest ./manifest.copy.txt] \
     [--dry-run] \
     [--force] \
-    [--no-set-versions] [--swirl-version v4_4_1_0] [--tika-version v4_4_1_0] [--ttm-version v4_4_1_0] \
+    [--no-set-versions] [--swirl-version v4_4_1_1] [--tika-version v4_4_1_0] [--ttm-version v4_4_1_0] \
     [--no-pull]
 
 Notes:
@@ -41,7 +41,7 @@ FORCE=0
 
 SET_VERSIONS=1
 DO_PULL=1
-NEW_SWIRL_VERSION="v4_4_1_0"
+NEW_SWIRL_VERSION="v4_4_1_1"
 NEW_TIKA_VERSION="v4_4_1_0"
 NEW_TTM_VERSION="v4_4_1_0"
 NEW_SWIRL_PATH="swirlai/release-swirl-search-enterprise"
@@ -129,7 +129,7 @@ set_env_kv() {
 
 # Snapshot dir
 TS="$(date +%Y%m%d-%H%M%S)"
-SNAP_DIR="$APP_DIR/rollback/4.4.0-to-4.4.1-$TS"
+SNAP_DIR="$APP_DIR/rollback/4.4.0.0-to-4.4.1.1-$TS"
 LAST_FILE="$APP_DIR/rollback/LAST"
 
 echo "==> App dir        : $APP_DIR"

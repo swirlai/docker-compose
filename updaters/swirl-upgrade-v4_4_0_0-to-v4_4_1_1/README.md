@@ -4,9 +4,9 @@ Here is a concise, customer-facing version suitable for distribution with the up
 
 # Swirl Upgrade Guide
 
-## 4.4.0 → 4.4.1 (Docker Compose)
+## 4.4.0.0 → 4.4.1.1 (Docker Compose)
 
-This package provides a supported upgrade path for Swirl Docker Compose deployments from **v4_4_0_0** to **v4_4_1_0**.
+This package provides a supported upgrade path for Swirl Docker Compose deployments from **v4_4_0_0** to **v4_4_1_1**.
 
 The upgrade is safe, snapshot-based, and preserves your existing configuration.
 
@@ -28,7 +28,7 @@ The upgrader will:
 * Restart services
 * Run required database migrations
 
-Database changes in 4.4.1 are additive and backward-compatible.
+Database changes in 4.4.1.1 are additive and backward-compatible.
 
 ---
 
@@ -36,17 +36,17 @@ Database changes in 4.4.1 are additive and backward-compatible.
 
 * Existing Swirl installation in `/app`
 * Docker and Docker Compose installed
-* 4.4.1 release package unpacked on the host
+* 4.4.1.1 release package unpacked on the host
 * Root or sudo access
 
 ---
 
 # Run the Upgrade
 
-1. Unpack the 4.4.1 release tarball:
+1. Unpack the 4.4.1.1 release tarball:
 
 ```bash
-tar -xzf docker-compose-4_4_1_0.tar.gz
+tar -xzf docker-compose-4_4_1_1.tar.gz
 ```
 
 2. Run the upgrader:
@@ -54,7 +54,7 @@ tar -xzf docker-compose-4_4_1_0.tar.gz
 ```bash
 sudo ./upgrade.sh \
   --app-dir /app \
-  --release-dir /path/to/docker-compose-4_4_1_0
+  --release-dir /path/to/docker-compose-4_4_1_1
 ```
 
 Example:
@@ -62,7 +62,7 @@ Example:
 ```bash
 sudo ./upgrade.sh \
   --app-dir /app \
-  --release-dir /home/azureuser/docker-compose-4_4_1_0
+  --release-dir /home/azureuser/docker-compose-4_4_1_1
 ```
 
 ---
