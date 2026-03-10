@@ -21,7 +21,7 @@ Usage:
     [--manifest ./manifest.copy.txt] \
     [--dry-run] \
     [--force] \
-    [--no-set-versions] [--swirl-version v4_4_1_1] [--tika-version v4_4_1_0] [--ttm-version v4_4_1_0] \
+    [--no-set-versions] [--swirl-version v4_4_1_1] [--tika-version v4_4_1_1] [--ttm-version v4_4_1_1] \
     [--no-pull]
 
 Notes:
@@ -42,8 +42,8 @@ FORCE=0
 SET_VERSIONS=1
 DO_PULL=1
 NEW_SWIRL_VERSION="v4_4_1_1"
-NEW_TIKA_VERSION="v4_4_1_0"
-NEW_TTM_VERSION="v4_4_1_0"
+NEW_TIKA_VERSION="v4_4_1_1"
+NEW_TTM_VERSION="v4_4_1_1"
 NEW_SWIRL_PATH="swirlai/release-swirl-search-enterprise"
 
 while [[ $# -gt 0 ]]; do
