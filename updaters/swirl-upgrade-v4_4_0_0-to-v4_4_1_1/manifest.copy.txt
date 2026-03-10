@@ -1,0 +1,17 @@
+# manifest.copy.txt (place next to upgrade.sh inside the upgrader tarball)
+Makefile
+docker-compose.yml
+env.example
+certbot/docker-entrypoint.sh
+nginx/docker-entrypoint.sh
+nginx/reloader.sh
+nginx/nginx-template.bootstrap
+nginx/nginx-template.notls
+nginx/nginx-template.tls
+doc/controlling-swirl-service.md
+doc/setup-instructions.md
+scripts/install-docker-images.sh
+scripts/swirl-load-job.sh
+scripts/swirl-load.sh
+scripts/swirl-service.sh
+scripts/swirl-shared.sh
