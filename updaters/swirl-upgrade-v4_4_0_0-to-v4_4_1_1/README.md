@@ -41,7 +41,7 @@ Database changes in 4.4.1.1 are additive and backward-compatible.
 # Unpack the upgrader
 ```bash
 tar -xzf upgrade_v4_4_0_0_to_v4_4_1_1.tar.gz
-cd swirl-upgrade-v4_4_0_0-to-v4_4_1_1
+cd updaters/swirl-upgrade-v4_4_0_0-to-v4_4_1_1
 ```
 
 # Run the Upgrade
@@ -49,7 +49,7 @@ cd swirl-upgrade-v4_4_0_0-to-v4_4_1_1
 1. Stop SWIRL
 
 ```bash
-sudo systemctl start swirl
+sudo systemctl stop swirl
 ```
 
 2. Unpack the 4.4.1.1 release tarball:
