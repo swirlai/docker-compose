@@ -43,7 +43,7 @@ Database changes in 4.4.1.1 are additive and backward-compatible.
 tar -xzf upgrade_v4_4_0_0_to_v4_4_1_1.tar.gz
 ```
 
-# Udate the version information in your .env file to read as follows
+# Update the version information in your .env file to read as follows
 ```bash
 SWIRL_VERSION=v4_4_1_1
 SWIRL_PATH="swirlai/release-swirl-search-enterprise"
