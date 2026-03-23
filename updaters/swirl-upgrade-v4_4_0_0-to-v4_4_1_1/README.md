@@ -79,6 +79,10 @@ sudo ./upgrade.sh \
 # Verify the Upgrade
 
 ```bash
+sudo systemctl start swirl
+```
+
+```bash
 cd /app
 docker compose ps
 ```
