@@ -1,6 +1,3 @@
-Here is a concise, customer-facing version suitable for distribution with the upgrader:
-
----
 
 # Swirl Upgrade Guide
 
