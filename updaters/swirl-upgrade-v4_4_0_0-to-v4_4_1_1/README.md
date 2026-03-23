@@ -41,7 +41,6 @@ Database changes in 4.4.1.1 are additive and backward-compatible.
 # Unpack the upgrader
 ```bash
 tar -xzf upgrade_v4_4_0_0_to_v4_4_1_1.tar.gz
-cd updaters/swirl-upgrade-v4_4_0_0-to-v4_4_1_1
 ```
 
 # Run the Upgrade
@@ -61,6 +60,7 @@ tar -xzf docker-compose-4_4_1_1.tar.gz
 3. Run the upgrader:
 
 ```bash
+cd updaters/swirl-upgrade-v4_4_0_0-to-v4_4_1_1/
 sudo ./upgrade.sh \
   --app-dir /app \
   --release-dir /path/to/docker-compose-4_4_1_1
