@@ -74,14 +74,6 @@ sudo ./upgrade.sh \
   --release-dir /path/to/docker-compose-4_4_1_1
 ```
 
-Example:
-
-```bash
-sudo ./upgrade.sh \
-  --app-dir /app \
-  --release-dir /home/azureuser/docker-compose-4_4_1_1
-```
-
 ---
 
 # Verify the Upgrade
