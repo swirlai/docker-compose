@@ -49,7 +49,7 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
     - [Connecting to Microsoft IDP](doc/service-setup.md#connecting-to-microsoft-idp)
     - [Connecting to Google IDP](doc/service-setup.md#connecting-to-google-idp)
 - [Controlling SWIRL Service](doc/controlling-swirl-service.md)
-- [Configuring MCP Proxy (optional)](doc/mcp-proxy-setup.md)
+- [Configuring the SWIRL MCP Server (optional)](doc/mcp-setup.md)
 
 # SWIRL Documentation
 
