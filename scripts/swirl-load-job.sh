@@ -62,6 +62,15 @@ python swirl.py load_data
 python swirl.py reload_ai_prompts
 python swirl.py load_branding
 
+# Point the preloaded Ollama AI Providers at the ollama sidecar
+python manage.py reconcile_ollama_url
+
+# Provision the DRF token the built-in MCP sidecar authenticates with
+if [ -n "$SWIRL_MCP_TOKEN" ]; then
+  echo "MCP Support: provisioning admin token for the MCP sidecar"
+  python manage.py ensure_token admin
+fi
+
 # Optionally SWIRL API User if environment variables are set
 if [ -n "$SWIRL_API_USERNAME" ] && [ -n "$SWIRL_API_PASSWORD" ]; then
   echo "MCP Support: Creating SWIRL API user: $SWIRL_API_USERNAME"

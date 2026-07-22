@@ -105,29 +105,60 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  qdrant:
+    profiles: ["all", "svc", "qdrant"]
+    image: qdrant/qdrant:${QDRANT_VERSION:-v1.18.2}
+    container_name: swirl_qdrant
+    restart: always
+    networks: ["swirl"]
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  seaweedfs:
+    profiles: ["all", "svc", "seaweedfs"]
+    image: chrislusf/seaweedfs:${SEAWEEDFS_VERSION:-4.36}
+    container_name: swirl_seaweedfs
+    restart: always
+    command: ["server", "-dir=/data", "-s3", "-volume.max=0"]
+    networks: ["swirl"]
+    volumes:
+      - seaweed_data:/data
+
+  ollama:
+    profiles: ["all", "svc", "ollama"]
+    image: ${OLLAMA_PATH:-swirlai/release-ollama-enterprise}:${OLLAMA_VERSION:-0.30.10}
+    container_name: swirl_ollama
+    restart: always
+    networks: ["swirl"]
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
   mcp:
     profiles: [ "all", "mcp" ]
-    image: swirlai/release-mcp-proxy-enterprise:${MCP_VERSION}
+    image: ${SWIRL_PATH}:${SWIRL_VERSION}
     container_name: swirl_mcp
+    restart: always
+    env_file:
+      - .env
     networks: [ "swirl" ]
-    ports:
-      - "${MCP_PORT}:${MCP_PORT}"      # expose the MCP port
+    command: ["python", "-m", "swirl_mcp", "--transport", "http", "--host", "0.0.0.0"]
     environment:
-      SWIRL_API_BASE: "${MCP_SWIRL_BASE_URL}"
-      SWIRL_API_BASE_PATH: "${MCP_SWIRL_BASE_PATH}"
-      SWIRL_API_PASSWORD: "${SWIRL_API_PASSWORD}"
-      SWIRL_API_USERNAME: "${SWIRL_API_USERNAME}"
-      SWIRL_MCP_SERVER_HOST: "0.0.0.0"
-      SWIRL_MCP_SERVER_PORT: "${MCP_PORT}"
-      SWIRL_MCP_SWIRL_API_TIMEOUT: "${MCP_TIMEOUT}"
-      SWIRL_MCP_PASSWORD: "${SWIRL_MCP_PASSWORD}"
-      SWIRL_MCP_USERNAME: "${SWIRL_MCP_USERNAME}"
+      SWIRL_MCP_BASE_URL: "http://swirl:${SWIRL_PORT:-8000}"
+      SWIRL_MCP_TOKEN: ${SWIRL_MCP_TOKEN:-}
+    ports:
+      - "${SWIRL_MCP_PORT:-8675}:8675"
     healthcheck:
-      test: [ "CMD-SHELL", "/app/scripts/check-mcp-health.sh || exit 1" ]
+      # The MCP endpoint answers non-protocol GETs with 4xx — any HTTP
+      # response at all means the server is up.
+      test: [ "CMD-SHELL", "curl -s -o /dev/null http://localhost:8675/mcp || exit 1" ]
       interval: 30s
-      timeout: 10s
+      timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 15s
     depends_on:
       swirl:
         condition: service_healthy
@@ -136,12 +167,6 @@ services:
     profiles: ["all", "svc", "tika"]
     image: swirlai/release-tika-enterprise:${TIKA_VERSION}
     container_name: swirl_tika
-    networks: ["swirl"]
-
-  ttm:
-    profiles: ["all", "svc", "ttm"]
-    image: swirlai/release-topic-text-matcher-enterprise:${TTM_VERSION}
-    container_name: swirl_ttm
     networks: ["swirl"]
 
   swirl-job:
@@ -182,7 +207,14 @@ services:
         condition: service_healthy
       redis-cache:
         condition: service_healthy
-
+      qdrant:
+        condition: service_started
+      seaweedfs:
+        condition: service_started
+      tika:
+        condition: service_started
+      ollama:
+        condition: service_started
       swirl-init:
         condition: service_completed_successfully
     command: ["/bin/bash","/tmp/swirl-load.sh"]
@@ -203,6 +235,12 @@ volumes:
   db_data:
     driver: local
     name: swirl_db_data
+  qdrant_data:
+    driver: local
+    name: swirl_qdrant_data
+  seaweed_data:
+    driver: local
+    name: swirl_seaweed_data
 
 networks:
   swirl:

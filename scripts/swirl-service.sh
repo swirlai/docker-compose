@@ -104,8 +104,12 @@ if [ -z "${SWIRL_FQDN:-}" ]; then
   exit 1
 fi
 
-if [ -z "${SWIRL_VERSION:-}" ] || [ -z "${TIKA_VERSION:-}" ] || [ -z "${TTM_VERSION:-}" ]; then
-  error "SWIRL_VERSION, TIKA_VERSION, and TTM_VERSION must all be set in .env file."
+if [ -z "${SWIRL_VERSION:-}" ] || [ -z "${TIKA_VERSION:-}" ]; then
+  error "SWIRL_VERSION and TIKA_VERSION must both be set in .env file."
+  exit 1
+fi
+if [ "${MCP_ENABLED:-false}" = "true" ] && [ -z "${SWIRL_MCP_TOKEN:-}" ]; then
+  error "MCP_ENABLED is true but SWIRL_MCP_TOKEN is not set in .env file."
   exit 1
 fi
 

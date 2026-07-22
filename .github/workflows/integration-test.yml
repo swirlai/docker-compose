@@ -58,7 +58,6 @@ jobs:
       USE_TLS: ${{ matrix.USE_TLS }}
       USE_LOCAL_POSTGRES: ${{ matrix.USE_LOCAL_POSTGRES }}
       TIKA_VERSION: ${{ vars.TIKA_VERSION }}
-      TTM_VERSION: ${{ vars.TTM_VERSION }}
       SWIRL_VERSION: ${{ vars.SWIRL_VERSION }}
 
     steps:
