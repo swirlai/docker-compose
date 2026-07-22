@@ -1,6 +1,3 @@
-Here is a concise, customer-facing version suitable for distribution with the upgrader:
-
----
 
 # Swirl Upgrade Guide
 
@@ -41,33 +38,49 @@ Database changes in 4.4.1.1 are additive and backward-compatible.
 
 ---
 
+# Unpack the upgrader
+```bash
+tar -xzf upgrade_v4_4_0_0_to_v4_4_1_1.tar.gz
+```
+
+# Update the version information in your .env file to read as follows
+```bash
+SWIRL_VERSION=v4_4_1_1
+SWIRL_PATH="swirlai/release-swirl-search-enterprise"
+TIKA_VERSION=v4_4_1_1
+TTM_VERSION=v4_4_1_1
+```
+
 # Run the Upgrade
 
-1. Unpack the 4.4.1.1 release tarball:
+1. Stop SWIRL
+
+```bash
+sudo systemctl stop swirl
+```
+
+2. Unpack the 4.4.1.1 release tarball:
 
 ```bash
 tar -xzf docker-compose-4_4_1_1.tar.gz
 ```
 
-2. Run the upgrader:
+3. Run the upgrader:
 
 ```bash
+cd updaters/swirl-upgrade-v4_4_0_0-to-v4_4_1_1/
 sudo ./upgrade.sh \
   --app-dir /app \
   --release-dir /path/to/docker-compose-4_4_1_1
 ```
 
-Example:
-
-```bash
-sudo ./upgrade.sh \
-  --app-dir /app \
-  --release-dir /home/azureuser/docker-compose-4_4_1_1
-```
-
 ---
 
 # Verify the Upgrade
+
+```bash
+sudo systemctl start swirl
+```
 
 ```bash
 cd /app
