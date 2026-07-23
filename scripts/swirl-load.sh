@@ -52,6 +52,16 @@ echo "msal and oauth config loading completed"
 # Wait for other services to initialize (e.g., database, search engines)
 sleep 30
 
+# Initialize the Semantic Cache backends (idempotent): the swirl_corpus /
+# swirl_memory Qdrant collections and the S3 document-storage bucket.
+# Warn loudly on failure but keep starting - search works without the cache.
+if ! python manage.py init_qdrant; then
+  echo "WARNING: init_qdrant failed - Semantic Cache collections not initialized; cache queries will be unavailable" >&2
+fi
+if ! python manage.py init_storage; then
+  echo "WARNING: init_storage failed - cache document storage bucket not initialized" >&2
+fi
+
 # Start background workers and the Daphne web server
 echo "Starting SWIRL"
 python swirl.py start celery-worker celery-healthcheck-worker celery-beats
