@@ -1,6 +1,6 @@
-# Setup Instructions
+# Production Deployment (Linux VM + systemd)
 
-This document explains how to configure and deploy SWIRL in your environment using docker-compose.
+This document explains how to deploy SWIRL as a managed service on a dedicated host — a Linux VM with systemd, optional TLS ingress, and DNS. For a local evaluation on a laptop or workstation, use the [Quick Start in the README](../README.md#quick-start-evaluation) instead.
 
 ---
 
@@ -19,7 +19,7 @@ Clone the docker-compose repository for the version you want to deploy and move 
 Example:
 
 ```sh
-git clone -b v4_3_0_0 https://github.com/swirlai/docker-compose swirl-enterprise-compose
+git clone -b v5_0_0_0 https://github.com/swirlai/docker-compose swirl-enterprise-compose
 cd swirl-enterprise-compose
 ```
 

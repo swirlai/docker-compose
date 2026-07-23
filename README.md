@@ -5,14 +5,30 @@
 **Notice:** this repository is commercially licensed. A valid license key is required for use.
 Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for more information.
 
-# Table of Contents
-1. [Installation](#installation)
-    - [Minimum System Requirements](#minimum-system-requirements)
-    - [Set up Instructions](doc/setup-instructions.md)
-2. [Setup Documentation](#setup-documentation)
-3. [Script Documentation](doc/script-documentation.md)
-4. [SWIRL Documentation](#swirl-documentation)
-5. [Support](#support)
+There are two ways to run SWIRL Enterprise from this repository:
+
+1. **[Quick Start (evaluation)](#quick-start-evaluation)** — a local install on a Mac or Linux workstation, running in minutes.
+2. **[Production deployment](doc/setup-instructions.md)** — a Linux VM with systemd, TLS ingress, and DNS.
+
+Product documentation lives at [docs.swirlaiconnect.com](https://docs.swirlaiconnect.com/) — see the [Installation Guide](https://docs.swirlaiconnect.com/Installation) and [Quick Start](https://docs.swirlaiconnect.com/Quick-Start-Enterprise).
+
+# Quick Start (evaluation)
+
+```sh
+git clone https://github.com/swirlai/docker-compose swirl-enterprise-compose
+cd swirl-enterprise-compose
+cp env.example .env
+```
+
+Edit `.env` and set the REQUIRED values: `SWIRL_LICENSE` (the signed license JSON from SWIRL), `ADMIN_PASSWORD`, `SQL_USER`, and `SQL_PASSWORD`. To enable the MCP server, also set `MCP_ENABLED=true` and `SWIRL_MCP_TOKEN`.
+
+```sh
+docker compose pull
+docker compose up -d
+docker compose logs -f swirl-init   # watch the one-time database setup complete
+```
+
+Then open [http://localhost:8000/galaxy/](http://localhost:8000/galaxy/) and log in as `admin` with the `ADMIN_PASSWORD` you set.
 
 # Installation
 
@@ -34,7 +50,8 @@ Please contact [hello@swirlaiconnect.com](mailto:hello@swirlaiconnect.com) for m
 - **Storage:** 100 GB of available disk space for installation
 - **Docker**: v27.3.1 or later
 
-# Setup Documentation
+# Production Setup Documentation
+- [Production Deployment (Linux VM + systemd)](doc/setup-instructions.md)
 - [Downloading SWIRL Enterprise](doc/downloading-swirl-enterprise-docker-environment.md)
 - [Description of Docker Support Installation Script](doc/docker-package-setup-ubuntu.md)
 - [Details of Setting up the SWIRL Service](doc/service-setup.md)
