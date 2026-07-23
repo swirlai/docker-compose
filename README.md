@@ -10,6 +10,8 @@ There are two ways to run SWIRL Enterprise from this repository:
 1. **[Quick Start (evaluation)](#quick-start-evaluation)** — a local install on a Mac or Linux workstation, running in minutes.
 2. **[Production deployment](doc/setup-instructions.md)** — a Linux VM with systemd, TLS ingress, and DNS.
 
+See [Monitoring and Logs](#monitoring-and-logs) for watching either kind of deployment.
+
 Product documentation lives at [docs.swirlaiconnect.com](https://docs.swirlaiconnect.com/) — see the [Installation Guide](https://docs.swirlaiconnect.com/Installation) and [Quick Start](https://docs.swirlaiconnect.com/Quick-Start-Enterprise).
 
 # Quick Start (evaluation)
@@ -29,6 +31,34 @@ docker compose logs -f swirl-init   # watch the one-time database setup complete
 ```
 
 Then open [http://localhost:8000/galaxy/](http://localhost:8000/galaxy/) and log in as `admin` with the `ADMIN_PASSWORD` you set.
+
+# Monitoring and Logs
+
+**Quick Start (docker compose)** — from this directory:
+
+```sh
+docker compose logs -f              # all services, follow
+docker compose logs -f swirl        # the SWIRL app only
+docker compose logs swirl-init     # one-time database setup
+docker compose logs swirl-job      # one-time seed/config job
+```
+
+**Application log files** — bind-mounted to `logs/` in this checkout, so you can tail them directly on the host:
+
+```sh
+tail -f logs/django.log                  # web/API server
+tail -f logs/celery-search-worker.log    # federated search execution
+```
+
+Also present: `celery-pagefetch-worker.log`, `celery-interactive-worker.log`, `celery-maintenance-worker.log`, `celery-healthcheck-worker.log`, and `celery-beats.log`.
+
+**Production (systemd service)**:
+
+```sh
+sudo journalctl -f -u swirl
+```
+
+**In the browser**: administrators can watch live logs in the Business Console [Log Viewer](https://docs.swirlaiconnect.com/Admin-Guide#log-viewer).
 
 # Installation
 
