@@ -145,7 +145,7 @@ SQL_PASSWORD="" # CHANGE ME  - SWIRL DB User password
 SQL_SSLMODE="prefer" # CHANGE ME  - SWIRL DB SSL mode
 ```
 
-> For more information see: [Admin Guide - Configuring Django](https://docs.swirl.today/Admin-Guide.html#configuring-django).
+> For more information see: [Admin Guide - Configuring Django](https://docs.swirlaiconnect.com/Admin-Guide#configuring-django).
 
 ## Configuring SWIRL Enterprise
 ### Licensing

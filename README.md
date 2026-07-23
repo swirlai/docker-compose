@@ -1,4 +1,4 @@
-![SWIRL](https://docs.swirl.today/images/transparent_header_3.png)
+<img src="https://docs.swirlaiconnect.com/images/swirl-galaxy-logo.svg" alt="SWIRL" width="220">
 
 # SWIRL Enterprise Edition
 
