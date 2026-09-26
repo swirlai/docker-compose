@@ -24,7 +24,7 @@ jobs:
       URLCHECK_SUMMARY: urlcheck_results_summary.md  # Define global variable
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Print Environment Variables
         run: env
@@ -51,14 +51,14 @@ jobs:
 
       - name: Upload Results
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: urlcheck-results
           path:  ${{ env.URLCHECK_RESULTS }}
 
       - name: Add comment to PR
         if: failure() && github.event_name == 'pull_request'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
