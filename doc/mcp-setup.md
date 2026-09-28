@@ -6,7 +6,7 @@ In this bundle the MCP server runs as its own container (`swirl_mcp`) from the s
 
 ## Setup
 
-1. Set `SWIRL_MCP_TOKEN` in `.env` to a long random value (this is in the REQUIRED section). The setup job provisions a matching API token for the `admin` user, and the MCP container authenticates to SWIRL with it.
+1. Set `SWIRL_MCP_TOKEN` in `.env` to a random value of **at most 40 characters** (for example `openssl rand -hex 20`); it becomes the API token key, which is limited to 40 characters (this is in the REQUIRED section). The setup job provisions a matching API token for the `admin` user, and the MCP container authenticates to SWIRL with it.
 2. Start the stack with the `all` profile, or add `--profile mcp` to your usual profiles.
 3. The MCP endpoint is available at `http://<your-host>:8675/mcp`. Change the host port with `SWIRL_MCP_PORT` in `.env`.
 

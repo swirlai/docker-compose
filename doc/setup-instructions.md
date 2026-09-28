@@ -19,7 +19,7 @@ Clone the docker-compose repository for the version you want to deploy and move 
 Example:
 
 ```sh
-git clone -b v5_0_0_0 https://github.com/swirlai/docker-compose swirl-enterprise-compose
+git clone -b v5_0_0_1 https://github.com/swirlai/docker-compose swirl-enterprise-compose
 cd swirl-enterprise-compose
 ```
 

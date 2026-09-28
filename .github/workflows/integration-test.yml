@@ -22,56 +22,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  # get-docker-images:
-  #   runs-on: ubuntu-latest-m
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v7
-
-  #     - name: Login to Docker Hub
-  #       uses: docker/login-action@v4
-  #       with:
-  #         username: ${{ secrets.SBS_DOCKER_USER }}
-  #         password: ${{ secrets.SBS_DOCKER_PAT }}
-
-  #     - name: Pull Docker images
-  #       run: sh scripts/pull-docker-images.sh
-
-  #     - name: Upload Docker image as artifact
-  #       uses: actions/upload-artifact@v7
-  #       with:
-  #         name: docker-image
-  #         path: docker-images.tar.gz
-
   compose-test:
-    name: Compose Test (Use TLS=${{ matrix.USE_TLS }}, Local PostgreSQL=${{ matrix.USE_LOCAL_POSTGRES }})
+    name: Compose Test (${{ matrix.scenario.name }})
+    # The public mirror (swirlai/docker-compose) has no access to the larger-runner group and no secrets;
+    # there this job queued for 24 h and was cancelled on every push. Inert by design outside this repo.
+    if: github.repository == 'swirlai/docker-compose-internal'
     runs-on: ubuntu-latest-m
-    # needs: get-docker-images
     strategy:
       fail-fast: false
       matrix:
-        # USE_TLS: ["true", "false"]
-        USE_TLS: ["false"]
-        # USE_LOCAL_POSTGRES: ["true", "false"]
-        USE_LOCAL_POSTGRES: ["true"]
-    env:
-      USE_TLS: ${{ matrix.USE_TLS }}
-      USE_LOCAL_POSTGRES: ${{ matrix.USE_LOCAL_POSTGRES }}
-      TIKA_VERSION: ${{ vars.TIKA_VERSION }}
-      SWIRL_VERSION: ${{ vars.SWIRL_VERSION }}
-
+        scenario:
+          # What env.example gives a customer out of the box: profiles svc,db,setup.
+          - { name: default,      USE_NGINX: "false", MCP_ENABLED: "false" }
+          # Reverse proxy in front, no TLS (certbot/ACME needs a real FQDN, so TLS stays out of CI).
+          - { name: nginx-no-tls, USE_NGINX: "true",  MCP_ENABLED: "false" }
+          # MCP server; the one-time setup job provisions the API token from SWIRL_MCP_TOKEN.
+          - { name: mcp,          USE_NGINX: "false", MCP_ENABLED: "true" }
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
-
-      # - name: Download Docker image artifact
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: docker-image
-
-      # - name: Load Docker image
-      #   run: |
-      #     gunzip -c docker-images.tar.gz | docker load
 
       - name: Login to Docker Hub
         uses: docker/login-action@v4
@@ -79,18 +48,124 @@ jobs:
           username: ${{ secrets.SBS_DOCKER_USER }}
           password: ${{ secrets.SBS_DOCKER_PAT }}
 
-      - name: Start Docker Compose
+      # .env = env.example (the bundle's own wiring, defaults and version pins) with the SWIRL_ENV secret
+      # (a base64-encoded .env) filling only the keys the template leaves empty: SWIRL_LICENSE,
+      # ADMIN_PASSWORD, SQL_USER, SQL_PASSWORD and the like. Then the scenario's switches are written
+      # into .env itself, because scripts/swirl-service.sh sources .env (job env would not reach it).
+      # Versions are no longer pinned by repo variables, so the test tracks what env.example ships. DS-5747.
+      - name: Build .env from env.example, the SWIRL_ENV secret, and the scenario
+        env:
+          SWIRL_ENV_B64: ${{ secrets.SWIRL_ENV }}
+          SCENARIO_USE_NGINX: ${{ matrix.scenario.USE_NGINX }}
+          SCENARIO_MCP_ENABLED: ${{ matrix.scenario.MCP_ENABLED }}
         run: |
-          echo "${{ secrets.SWIRL_ENV }}" | base64 --decode > .env
-          docker compose --profile all up -d
+          set -euo pipefail
+          [ -n "$SWIRL_ENV_B64" ] || { echo "::error::SWIRL_ENV secret is empty"; exit 1; }
+          printf '%s' "$SWIRL_ENV_B64" | base64 --decode > secret.env
+          python3 - <<'PY'
+          import os, re, secrets
+          def parse(path):
+              out = {}
+              for raw in open(path, encoding="utf-8"):
+                  line = raw.strip()
+                  if not line or line.startswith("#") or "=" not in line:
+                      continue
+                  k, v = line.split("=", 1)
+                  out[k.strip()] = v
+              return out
+          def blank(v):
+              return not v.strip().strip("'\"")
+          base, raw = parse("env.example"), parse("secret.env")
+          # The secret may only fill keys env.example leaves EMPTY (what a customer supplies). Every key
+          # the template sets is the bundle's own wiring or pin and the template wins; an old full .env in
+          # the secret once overrode the Redis URLs with a stale hostname and broke start-up.
+          over, ignored = {}, []
+          for k, v in raw.items():
+              if blank(v):
+                  ignored.append(f"{k} (empty)")
+              elif k not in base:
+                  ignored.append(f"{k} (not in env.example)")
+              elif not blank(base[k]):
+                  ignored.append(f"{k} (template-owned)")
+              else:
+                  over[k] = v
+          # Scenario switches, and a token so the setup job can provision MCP when it is enabled.
+          over["USE_TLS"] = "false"
+          over["USE_CERT"] = "false"
+          over["USE_LOCAL_POSTGRES"] = "true"
+          over["USE_NGINX"] = os.environ["SCENARIO_USE_NGINX"]
+          over["MCP_ENABLED"] = os.environ["SCENARIO_MCP_ENABLED"]
+          if over["MCP_ENABLED"] == "true" and blank(over.get("SWIRL_MCP_TOKEN", "")):
+              over["SWIRL_MCP_TOKEN"] = secrets.token_hex(20)  # 40 chars: the DRF token key column is varchar(40)
+          lines, seen = [], set()
+          for raw_line in open("env.example", encoding="utf-8"):
+              line = raw_line.rstrip("\n")
+              m = re.match(r"\s*([A-Za-z_][A-Za-z0-9_]*)=", line)
+              if m and m.group(1) in over:
+                  k = m.group(1); lines.append(f"{k}={over[k]}"); seen.add(k)
+              else:
+                  lines.append(line)
+          open(".env", "w", encoding="utf-8").write("\n".join(lines) + "\n")
+          print("keys set by the secret or scenario:", ", ".join(sorted(seen)))
+          print(f"secret keys ignored ({len(ignored)}):", ", ".join(sorted(ignored)) or "(none)")
+          for k in ("SWIRL_LICENSE", "ADMIN_PASSWORD", "SQL_USER", "SQL_PASSWORD"):
+              v = over.get(k, base.get(k, "")).strip().strip("'\"")
+              print(f"{k}: {'set' if v else 'EMPTY'}")
+          PY
+          rm -f secret.env
+          echo "--- effective bundle pins and switches ---"
+          grep -E '^(SWIRL_PATH|SWIRL_VERSION|TIKA_VERSION|USE_NGINX|USE_TLS|USE_LOCAL_POSTGRES|MCP_ENABLED)=' .env
+
+      # scripts/swirl-service.sh starts with --pull never, exactly as on a customer host.
+      - name: Pull the images the bundle pins
+        run: docker compose --profile all pull --quiet
+
+      # Start the stack the way a customer does: the service script renders the nginx template, adds the
+      # one-time setup profile, computes the active profiles from .env and runs compose up (foreground).
+      - name: Start the stack via scripts/swirl-service.sh
+        run: |
+          set -euo pipefail
+          sudo mkdir -p /var/log/swirl && sudo chown "$(id -u)" /var/log/swirl
+          chmod +x scripts/*.sh
+          nohup bash scripts/swirl-service.sh > swirl-service.out 2>&1 &
+          echo "service script pid $!"
+          # The script starts the db profile first, renders templates, then runs the real compose up and
+          # logs the profiles it chose right before. Gate on that line, then on every expected service
+          # having a container, so the health check never runs against a half-started stack.
+          for i in $(seq 1 36); do
+            grep -q 'Docker Compose Up with profiles:' swirl-service.out && break
+            sleep 5
+          done
+          PROFILES=$(grep -oE 'Docker Compose Up with profiles: [a-z,]+' swirl-service.out | head -1 | sed 's/.*: //')
+          [ -n "$PROFILES" ] || { echo "::error::swirl-service.sh never reached compose up"; tail -60 swirl-service.out; exit 1; }
+          echo "profiles chosen by the script: $PROFILES"
+          echo "COMPOSE_PROFILES=$PROFILES" >> "$GITHUB_ENV"
+          EXPECTED=$(COMPOSE_PROFILES="$PROFILES" docker compose config --services | sort)
+          echo "expected services:"; echo "$EXPECTED" | sed 's/^/  /'
+          for i in $(seq 1 36); do
+            PRESENT=$(docker compose --profile all ps -a --format '{{.Service}}' | sort -u)
+            MISSING=$(comm -23 <(echo "$EXPECTED") <(echo "$PRESENT") | tr '\n' ' ')
+            [ -z "$MISSING" ] && { echo "all expected services have containers after ${i}x5s"; break; }
+            sleep 5
+          done
+          [ -z "${MISSING:-}" ] || { echo "::error::services never started: $MISSING"; tail -60 swirl-service.out; exit 1; }
+          echo "--- swirl-service.sh output so far ---"
+          grep -E 'template|profiles|ERROR' swirl-service.out || true
 
       - name: Wait for services to become healthy
+        env:
+          HEALTH_TIMEOUT_SECONDS: '600'
         run: sh scripts/check-service-health.sh
 
-      - name: Show logs on failure
+      - name: Show container state and logs on failure
         if: failure()
-        run: docker compose logs
+        run: |
+          docker compose --profile all ps -a
+          echo "===== swirl-service.sh output (tail) ====="
+          tail -80 swirl-service.out || true
+          echo "===== container logs ====="
+          docker compose --profile all logs
 
       - name: Stop Docker Compose
         if: always()
-        run: docker compose down -v
+        run: docker compose --profile all down -v --remove-orphans
